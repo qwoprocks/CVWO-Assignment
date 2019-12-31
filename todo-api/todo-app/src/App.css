@@ -1,21 +1,11 @@
+body {
+  background-color: #282c34;
+}
 .App {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -24,15 +14,108 @@
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+ul.taskList {
+  padding: 0 25px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+li.task {
+  list-style-type: none;
+  font-family: Tahoma;
+  font-size: 1.2em;
+  padding: 10px 0;
+  border-bottom: 1px solid #ccc;
+}
+
+li.task:hover .deleteTaskBtn {
+  visibility: visible;
+  opacity: 1;
+}
+
+input.taskCheckbox {
+  position: relative;
+  float: left;
+  margin-right: 10px;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  margin-left: 5px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+input.taskCheckbox:checked:after {
+  color: green;
+  content: "\2713";
+  display: block;
+  font-size: 17px;
+  height: 17px;
+  position: absolute;
+  width: 17px;
+  left: 0.5px;
+  bottom: 2px;
+}
+
+input.taskCheckbox + label.taskLabel {
+  color: black;
+}
+
+input.taskCheckbox:checked + label.taskLabel {
+  text-decoration: line-through;
+  color: #656565;
+}
+
+input[placeholder] {
+  font-size: 1.1em;
+}
+
+.container {
+  width: 40%;
+  height: 400px;
+  position: relative;
+  margin: 0 auto;
+  border-radius: 5px;
+}
+
+.header {
+  color: black;
+  padding: 5px;
+  text-align: center;
+  font-family: Tahoma, sans-serif;
+}
+
+.inputContainer {
+  display: block;
+  padding: 0 20%;
+}
+
+.inputContainer .taskInput {
+  display: block;
+  padding: 10px;
+  width: 100%;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.listWrapper {
+  display: block;
+}
+
+.deleteTaskBtn {
+  float: right;
+  color: red;
+  background: rgba(0,0,0,0);
+  font-size: 20px;
+  font-weight: bold;
+  border: 1px solid white;
+  border-radius: 50%;
+  padding: 10px 5px;
+  visibility: hidden;
+  opacity: 0;
+  line-height: 0;
+  margin-right: 5px;
+  cursor: default;
 }
