@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from "@material-ui/icons/Edit";
+import Checkbox from "@material-ui/core/Checkbox";
 
 interface Todo {
   id: number;
@@ -27,12 +30,13 @@ function TodosContainer() {
     }
   };
 
-  const deleteTodo = (id : number) => {
-    axios.delete(`/api/v1/todos/${id}`)
-    .then(response => {
-      refresh();
-    })
-    .catch(error => console.log(error))
+  const deleteTodo = (id: number) => {
+    axios
+      .delete(`/api/v1/todos/${id}`)
+      .then(response => {
+        refresh();
+      })
+      .catch(error => console.log(error));
   };
 
   useEffect(() => {
@@ -46,7 +50,7 @@ function TodosContainer() {
   }, [toggleRefresh]);
 
   return (
-    <div>
+    <div className="container">
       <div className="inputContainer">
         <input
           className="taskInput"
@@ -56,24 +60,28 @@ function TodosContainer() {
           onKeyPress={createTodo}
         />
       </div>
-      <div className="listWrapper">
-        <ul className="taskList">
-          {todos.map(todo => {
-            return (
-              <li className="task" value={todo.title} key={todo.id}>
-                <input className="taskCheckbox" type="checkbox" />
-                <label className="taskLable">{todo.title}</label>
-                <span 
-                  className="deleteTaskBtn"
-                  onClick={() => deleteTodo(todo.id)}
-                >
-                  x
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+      <ul className="taskList">
+        {todos.map(todo => {
+          return (
+            <li className="task" value={todo.title} key={todo.id}>
+              <Checkbox />
+              <label className="taskLable">{todo.title}</label>
+              <span
+                className="deleteTaskBtn"
+                onClick={() => deleteTodo(todo.id)}
+              >
+                <DeleteIcon />
+              </span>
+              <span 
+                className="editTaskBtn"
+                onClick={() => {}}
+              >
+                <EditIcon />
+              </span>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }

@@ -15,52 +15,24 @@ body {
   color: white;
 }
 
-ul.taskList {
-  padding: 0 20%;
-}
-
-li.task {
-  list-style-type: none;
-  font-size: 1.2em;
-  padding: 10px 0;
-  margin: 10px 0;
-  border-bottom: 1px solid #ccc;
-  background-color: white;
-  border-radius: 5px;
-  border-color: black;
-}
-
-li.task:hover .deleteTaskBtn {
-  visibility: visible;
-  opacity: 1;
-}
-
-input.taskCheckbox {
-  position: relative;
-  float: left;
-  margin-right: 10px;
-  -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  outline: none;
-  margin-left: 5px;
-  text-align: center;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-input.taskCheckbox:checked:after {
-  color: green;
-  content: "\2713";
+.container {
   display: block;
-  font-size: 17px;
-  height: 17px;
-  position: absolute;
-  width: 17px;
-  left: 0.5px;
-  bottom: 2px;
+  width: 50%;
+  margin: 0 auto;
+}
+
+.inputContainer {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+.taskInput {
+  width: 80%;
+  padding: 10px;
+  border-radius: 8px;
 }
 
 input.taskCheckbox + label.taskLabel {
@@ -76,55 +48,81 @@ input[placeholder] {
   font-size: 1.1em;
 }
 
-.container {
-  width: 40%;
-  height: 400px;
-  position: relative;
-  margin: 0 auto;
-  border-radius: 5px;
-}
-
-.header {
-  color: black;
-  padding: 5px;
-  text-align: center;
-}
-
-.inputContainer {
-  display: block;
-  padding: 0 20%;
-  margin-bottom: 40px;
-}
-
-.inputContainer .taskInput {
-  display: block;
-  padding: 10px;
+ul.taskList {
   width: 100%;
-  border-radius: 8px;
-  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
 }
 
-.listWrapper {
-  display: block;
+li.task {
+  display: flex-box;
+  width: 80%;
+  vertical-align: middle;
+  list-style-type: none;
+  font-size: 1.2em;
+  padding: 10px 10px;
+  padding-right: 5px;
+  margin: 5px 0;
+  border-bottom: 1px solid #ccc;
+  background-color: white;
+  border-radius: 5px;
+  border-color: black;
+}
+
+/* This is for the checkbox item */
+.task span:first-child {
+  padding: 0;
+  float: left;
+  -webkit-appearance: none;
+  line-height: 0;
+  outline: none;
+  border-radius: 10%;
 }
 
 .editTaskBtn {
   float: right;
-  color: blue;
-}
-
-.deleteTaskBtn {
-  float: right;
-  color: red;
+  color: #f50057;
   background: rgba(0,0,0,0);
   font-size: 20px;
-  font-weight: bold;
-  border: 1px solid white;
-  border-radius: 50%;
-  padding: 10px 5px;
   visibility: hidden;
   opacity: 0;
   line-height: 0;
   margin-right: 5px;
-  cursor: default;
+  border-radius: 10%;
+}
+
+.editTaskBtn:hover {
+  background-color: #DDDDDD;
+  cursor: pointer;
+}
+
+.deleteTaskBtn {  
+  float: right;
+  color: #f50057;
+  background: rgba(0,0,0,0);
+  font-size: 20px;
+  visibility: hidden;
+  opacity: 0;
+  line-height: 0;
+  margin-right: 5px;
+  border-radius: 10%;
+}
+
+.deleteTaskBtn:hover {
+  background-color: #DDDDDD;
+  cursor: pointer;
+}
+
+li.task:hover .deleteTaskBtn {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+li.task:hover .editTaskBtn {
+  visibility: visible;
+  opacity: 1;
 }
