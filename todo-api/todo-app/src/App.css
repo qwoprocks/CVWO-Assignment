@@ -1,6 +1,7 @@
 body {
   background-color: #282c34;
 }
+
 .App {
   text-align: center;
 }
@@ -20,7 +21,6 @@ ul.taskList {
 
 li.task {
   list-style-type: none;
-  font-family: Tahoma;
   font-size: 1.2em;
   padding: 10px 0;
   margin: 10px 0;
@@ -88,7 +88,6 @@ input[placeholder] {
   color: black;
   padding: 5px;
   text-align: center;
-  font-family: Tahoma, sans-serif;
 }
 
 .inputContainer {
