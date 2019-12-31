@@ -15,7 +15,7 @@ body {
 }
 
 ul.taskList {
-  padding: 0 25px;
+  padding: 0 20%;
 }
 
 li.task {
@@ -23,7 +23,11 @@ li.task {
   font-family: Tahoma;
   font-size: 1.2em;
   padding: 10px 0;
+  margin: 10px 0;
   border-bottom: 1px solid #ccc;
+  background-color: white;
+  border-radius: 5px;
+  border-color: black;
 }
 
 li.task:hover .deleteTaskBtn {
@@ -90,6 +94,7 @@ input[placeholder] {
 .inputContainer {
   display: block;
   padding: 0 20%;
+  margin-bottom: 40px;
 }
 
 .inputContainer .taskInput {
@@ -102,6 +107,11 @@ input[placeholder] {
 
 .listWrapper {
   display: block;
+}
+
+.editTaskBtn {
+  float: right;
+  color: blue;
 }
 
 .deleteTaskBtn {
