@@ -1,11 +1,11 @@
 class TodosController < ApplicationController
   def index
-      todos = Todo.order("created_at DESC")
+      todos = Todo.order("created_at DESC").where(creatorid: session[:userid])
       render json: todos
   end
 
   def create
-      todo = Todo.create(todo_param)
+      todo = Todo.create(todo_param.merge(:creatorid => session[:userid]))
       render json: todo
   end
 
@@ -23,6 +23,6 @@ class TodosController < ApplicationController
 
   private
     def todo_param
-      params.require(:todo).permit(:title, :done)
+      params.require(:todo).permit(:title, :done, :creatorid)
     end
 end

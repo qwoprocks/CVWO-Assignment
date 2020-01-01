@@ -55,10 +55,12 @@ const SignupForm = () => {
       })
       .then(response => {
         if (response.data.error) {
-          dialog.alert(response.data.error);
+          dialog.alert("Error: " + String(response.data.error));
+        } else {
+          window.location.reload();
         }
       })
-      .catch(error => dialog.alert(error));
+      .catch(error => "Error, unable to create account.\n" + dialog.alert(error));
   };
 
   return (

@@ -4,7 +4,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import Checkbox from "@material-ui/core/Checkbox";
 import LogoutButton from "./LogoutButton";
-import { useDialog } from 'muibox'
+import { useDialog } from "muibox";
 
 interface Todo {
   id: number;
@@ -29,7 +29,9 @@ const TodosContainer = () => {
           element.value = "";
           refresh();
         })
-        .catch(error => dialog.alert("Error, unable to create Todo.\n" + error));
+        .catch(error =>
+          dialog.alert("Error, unable to create Todo.\n" + error)
+        );
     }
   };
 
@@ -53,9 +55,12 @@ const TodosContainer = () => {
 
   useEffect(() => {
     axios
-      .get("/api/v1/todos")
-      .then(res => {
-        setTodos(res.data);
+      .get(`/api/v1/todos`)
+      .then(response => {
+        console.log(response);
+        if (response.data !== null) {
+          setTodos(response.data);
+        }
       })
       .catch(err => dialog.alert("Error, unable to fetch Todos.\n" + err));
   }, [dialog, toggleRefresh]);
