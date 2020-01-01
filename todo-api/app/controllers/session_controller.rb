@@ -3,50 +3,40 @@ class SessionController < ApplicationController
         is_logged_in?
     end
 
-    def login
-        session[:userid] = @user.userid
-    end
-
     def create
-        @user = User.find_by(email: session_params[:email])
+        @user = User.find_by(email: params[:email])
 
-        if @user && @user.authenticate(session_params[:password])
-            login
+        if @user && @user.authenticate(params[:password])
+            session[:userid] = @user.id
             render json: {
                 logged_in: true,
                 user: @user
             }
         else
             render json: {
-                error: ['no such user, please check credentials']
+                logged_in: false,
+                error: 'no such user, please check credentials'
             }
         end
     end
 
-    def logged_in?
-        @current_user ||= User.find(session[:userid]) if session[:userid]
-    end
-
     def is_logged_in?
-        if logged_in? && current_user
+        @current_user ||= User.find(session[:userid]) if session[:userid]
+        if @current_user
             render json: {
                 logged_in: true,
-                user: current_user
+                user: session[:userid]
             }
         else
             render json: {
                 logged_in: false,
-                message: 'not signed in'
+                message: session[:userid]
             }
         end
     end
 
-    def logout
-        session.clear
-    end
-
     def destroy
-        logout
+        session.clear
         render json: {
             logged_in: false
         }
@@ -54,6 +44,6 @@ class SessionController < ApplicationController
 
     private
     def session_params
-        params.require(:user).permit(:userid, :username, :email, :password)
+        params.require(:user).permit(:username, :email, :password)
     end
 end

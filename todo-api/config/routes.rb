@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   scope '/api/v1' do
       resources :todos
       resources :session
+      resources :users
   end
   #get 'todos/index'
   #get 'todos/create'

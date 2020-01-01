@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import Checkbox from "@material-ui/core/Checkbox";
+import LogoutButton from "./LogoutButton";
 
 interface Todo {
   id: number;
@@ -10,7 +12,8 @@ interface Todo {
   done: boolean;
 }
 
-function TodosContainer() {
+const TodosContainer = () => {
+  const history = useHistory();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [toggleRefresh, setRefresh] = useState(false);
   const refresh = () => setRefresh(!toggleRefresh);
@@ -39,6 +42,15 @@ function TodosContainer() {
       .catch(error => console.log(error));
   };
 
+  const logout = () => {
+    axios
+      .delete("/api/v1/session/0")
+      .then(response => {
+        window.location.reload();
+      })
+      .catch(err => console.log(err));
+  };
+
   useEffect(() => {
     axios
       .get("/api/v1/todos")
@@ -47,16 +59,11 @@ function TodosContainer() {
         console.log(res.data);
       })
       .catch(err => console.log(err));
-    axios
-      .get("/api/v1/session", {withCredentials: true})
-      .then(res => {
-        console.log(res)
-      })
-      .catch(err => console.log(err));
   }, [toggleRefresh]);
 
   return (
     <div className="container">
+      <LogoutButton onClick={logout} />
       <div className="inputContainer">
         <input
           className="taskInput"
@@ -78,10 +85,7 @@ function TodosContainer() {
               >
                 <DeleteIcon />
               </span>
-              <span 
-                className="editTaskBtn"
-                onClick={() => {}}
-              >
+              <span className="editTaskBtn" onClick={() => {}}>
                 <EditIcon />
               </span>
             </li>
@@ -90,6 +94,6 @@ function TodosContainer() {
       </ul>
     </div>
   );
-}
+};
 
 export default TodosContainer;
