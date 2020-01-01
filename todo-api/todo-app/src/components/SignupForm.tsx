@@ -10,6 +10,7 @@ import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import { useDialog } from "muibox";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -33,27 +34,31 @@ const useStyles = makeStyles(theme => ({
 
 const SignupForm = () => {
   const classes = useStyles();
+  const dialog = useDialog();
 
   const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (e.currentTarget.password.value !== e.currentTarget.password_repeat.value) {
-      console.log("Passwords do not match");
+    if (
+      e.currentTarget.password.value !== e.currentTarget.password_repeat.value
+    ) {
+      dialog.alert("Passwords do not match");
       return;
     }
-    console.log(e.currentTarget.password.value);
     axios
-      .post("/api/v1/users", {user : {
-        email: e.currentTarget.email.value,
-        username: e.currentTarget.username.value,
-        password: e.currentTarget.password.value},
+      .post("/api/v1/users", {
+        user: {
+          email: e.currentTarget.email.value,
+          username: e.currentTarget.username.value,
+          password: e.currentTarget.password.value
+        },
         withCredentials: true
       })
       .then(response => {
         if (response.data.error) {
-          console.log(response.data.error);
+          dialog.alert(response.data.error);
         }
       })
-      .catch(error => console.log(error));
+      .catch(error => dialog.alert(error));
   };
 
   return (

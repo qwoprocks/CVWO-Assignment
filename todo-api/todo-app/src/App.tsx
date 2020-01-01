@@ -6,6 +6,7 @@ import {
     Switch,
     Route
 } from "react-router-dom";
+import { DialogProvider } from "muibox";
 import "./App.css";
 import TodosContainer from "./components/TodosContainer";
 import LoginForm from "./components/LoginForm";
@@ -14,7 +15,7 @@ import SignupForm from "./components/SignupForm";
 const App: React.FC = () => {
     const [user, setUser] = useState(0);
     const loggedin = () => {
-        return (typeof user !== 'undefined') && (user !== 0);
+        return typeof user !== "undefined" && user !== 0;
     };
 
     useEffect(() => {
@@ -27,12 +28,13 @@ const App: React.FC = () => {
     }, []);
 
     return (
-        <Router>
-            <div className="App">
-                <header className="App-header">
-                    <h1>Todo List</h1>
-                </header>
-                {/*user === 0 ? (
+        <DialogProvider>
+            <Router>
+                <div className="App">
+                    <header className="App-header">
+                        <h1>Todo List</h1>
+                    </header>
+                    {/*user === 0 ? (
                     <Switch>
                         <Route path="/login">
                             <LoginForm />
@@ -55,30 +57,39 @@ const App: React.FC = () => {
                     </Switch>
                 )*/}
 
-                <Switch>
-                    <Route path="/login">
-                        {loggedin() ? <Redirect to="/todos" /> :  <LoginForm />}
-                    </Route>
-                    <Route path="/signup">
-                        {loggedin() ? <Redirect to="/todos" /> :<SignupForm />}
-                    </Route>
-                    <Route path="/todos">
-                        {loggedin() ? (
-                            <TodosContainer />
-                        ) : (
-                            <Redirect to="/login" />
-                        )}
-                    </Route>
-                    <Route path="/">
-                        {user === 0 ? (
-                            <Redirect to="/todos" />
-                        ) : (
-                            <Redirect to="/login" />
-                        )}
-                    </Route>
-                </Switch>
-            </div>
-        </Router>
+                    <Switch>
+                        <Route path="/login">
+                            {loggedin() ? (
+                                <Redirect to="/todos" />
+                            ) : (
+                                <LoginForm />
+                            )}
+                        </Route>
+                        <Route path="/signup">
+                            {loggedin() ? (
+                                <Redirect to="/todos" />
+                            ) : (
+                                <SignupForm />
+                            )}
+                        </Route>
+                        <Route path="/todos">
+                            {loggedin() ? (
+                                <TodosContainer />
+                            ) : (
+                                <Redirect to="/login" />
+                            )}
+                        </Route>
+                        <Route path="/">
+                            {user === 0 ? (
+                                <Redirect to="/todos" />
+                            ) : (
+                                <Redirect to="/login" />
+                            )}
+                        </Route>
+                    </Switch>
+                </div>
+            </Router>
+        </DialogProvider>
     );
 };
 

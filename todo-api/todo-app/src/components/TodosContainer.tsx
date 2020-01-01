@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
 import axios from "axios";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import Checkbox from "@material-ui/core/Checkbox";
 import LogoutButton from "./LogoutButton";
+import { useDialog } from 'muibox'
 
 interface Todo {
   id: number;
@@ -13,7 +13,7 @@ interface Todo {
 }
 
 const TodosContainer = () => {
-  const history = useHistory();
+  const dialog = useDialog();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [toggleRefresh, setRefresh] = useState(false);
   const refresh = () => setRefresh(!toggleRefresh);
@@ -29,7 +29,7 @@ const TodosContainer = () => {
           element.value = "";
           refresh();
         })
-        .catch(error => console.log(error));
+        .catch(error => dialog.alert("Error, unable to create Todo.\n" + error));
     }
   };
 
@@ -39,7 +39,7 @@ const TodosContainer = () => {
       .then(response => {
         refresh();
       })
-      .catch(error => console.log(error));
+      .catch(error => dialog.alert("Error, unable to delete Todo.\n" + error));
   };
 
   const logout = () => {
@@ -48,7 +48,7 @@ const TodosContainer = () => {
       .then(response => {
         window.location.reload();
       })
-      .catch(err => console.log(err));
+      .catch(err => dialog.alert("Error, unable to logout.\n" + err));
   };
 
   useEffect(() => {
@@ -56,10 +56,9 @@ const TodosContainer = () => {
       .get("/api/v1/todos")
       .then(res => {
         setTodos(res.data);
-        console.log(res.data);
       })
-      .catch(err => console.log(err));
-  }, [toggleRefresh]);
+      .catch(err => dialog.alert("Error, unable to fetch Todos.\n" + err));
+  }, [dialog, toggleRefresh]);
 
   return (
     <div className="container">

@@ -15,7 +15,7 @@ class SessionController < ApplicationController
         else
             render json: {
                 logged_in: false,
-                error: 'no such user, please check credentials'
+                error: 'Username and/or password may be incorrect, please check your credentials'
             }
         end
     end

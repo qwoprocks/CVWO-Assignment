@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import axios from "axios";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
@@ -10,6 +10,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import { useDialog } from 'muibox'
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -33,6 +34,7 @@ const useStyles = makeStyles(theme => ({
 
 const LoginForm = () => {
   const classes = useStyles();
+  const dialog = useDialog();
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -44,12 +46,12 @@ const LoginForm = () => {
       })
       .then(response => {
         if (response.data.error) {
-          console.log(response.data.error);
+          dialog.alert(response.data.error);
         } else {
           window.location.reload();
         }
       })
-      .catch(error => console.log(error));
+      .catch(error => dialog.alert(error));
   };
 
   return (
