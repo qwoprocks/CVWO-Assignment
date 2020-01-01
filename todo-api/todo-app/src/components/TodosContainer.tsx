@@ -47,6 +47,12 @@ function TodosContainer() {
         console.log(res.data);
       })
       .catch(err => console.log(err));
+    axios
+      .get("/api/v1/session", {withCredentials: true})
+      .then(res => {
+        console.log(res)
+      })
+      .catch(err => console.log(err));
   }, [toggleRefresh]);
 
   return (
