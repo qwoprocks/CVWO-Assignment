@@ -14,6 +14,7 @@ import SignupForm from "./components/SignupForm";
 
 const App: React.FC = () => {
     const [user, setUser] = useState(0);
+    const [doneLoading, setDoneLoading] = useState(false);
     const loggedin = () => {
         return typeof user !== "undefined" && user !== 0;
     };
@@ -23,11 +24,12 @@ const App: React.FC = () => {
             .get("/api/v1/session", { withCredentials: true })
             .then(res => {
                 setUser(res.data.user);
+                setDoneLoading(true);
             })
             .catch(err => console.log(err));
     }, []);
 
-    return (
+    return doneLoading ? (
         <DialogProvider>
             <Router>
                 <div className="App">
@@ -90,6 +92,8 @@ const App: React.FC = () => {
                 </div>
             </Router>
         </DialogProvider>
+    ) : (
+        <></>
     );
 };
 
