@@ -43,12 +43,19 @@ const TodosContainer = () => {
   };
 
   const deleteTodo = (id: number) => {
-    axios
-      .delete(`/api/v1/todos/${id}`)
-      .then(response => {
-        refreshTodos();
+    dialog
+      .confirm("Are you sure you want to delete this Todo?")
+      .then(() => {
+        axios
+          .delete(`/api/v1/todos/${id}`)
+          .then(response => {
+            refreshTodos();
+          })
+          .catch(error =>
+            dialog.alert("Error, unable to delete Todo.\n" + error)
+          );
       })
-      .catch(error => dialog.alert("Error, unable to delete Todo.\n" + error));
+      .catch(() => {});
   };
 
   const logout = () => {
@@ -75,11 +82,17 @@ const TodosContainer = () => {
       .catch(err => dialog.alert("Error, unable to update Todo\n" + err));
   };
 
-  const handleEditBoxCancel = () => {
-    dialog
-      .confirm("Are you sure you want to cancel without saving?")
-      .then(() => setEditBoxOpen(false))
-      .catch(() => {});
+  const handleEditBoxCancel = (title: string) => {
+    console.log(editTodo.title);
+    console.log(title);
+    if (editTodo.title === title) {
+      setEditBoxOpen(false);
+    } else {
+      dialog
+        .confirm("Are you sure you want to cancel without saving?")
+        .then(() => setEditBoxOpen(false))
+        .catch(() => {});
+    }
   };
 
   useEffect(() => {
@@ -133,7 +146,7 @@ const TodosContainer = () => {
         defaultValue={editTodo.title}
         open={editBoxOpen}
         save={(s: string) => handleEditBoxSave(s)}
-        cancel={() => handleEditBoxCancel()}
+        cancel={(s: string) => handleEditBoxCancel(s)}
       />
     </div>
   );

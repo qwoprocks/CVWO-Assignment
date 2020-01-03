@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -12,7 +12,7 @@ const EditBox = (props: {
   defaultValue: string;
   open: boolean;
   save: (s: string) => void;
-  cancel: () => void;
+  cancel: (s: string) => void;
 }) => {
   const [value, setValue] = useState("");
 
@@ -28,18 +28,20 @@ const EditBox = (props: {
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             <TextField
+              autoFocus
               id="standard-multiline-static"
               label="Todo"
               defaultValue={props.defaultValue}
+              onFocus={e => setValue(e.target.value)}
               onChange={e => setValue(e.target.value)}
             />
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => props.save(value)} color="primary" autoFocus>
+          <Button onClick={() => props.save(value)} color="primary">
             Save
           </Button>
-          <Button onClick={props.cancel} color="primary" autoFocus>
+          <Button onClick={() => props.cancel(value)} color="primary">
             Cancel
           </Button>
         </DialogActions>
