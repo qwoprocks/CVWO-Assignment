@@ -5,6 +5,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import Checkbox from "@material-ui/core/Checkbox";
 import LogoutButton from "./LogoutButton";
 import { useDialog } from "muibox";
+import EditBox from "./EditBox";
 
 interface Todo {
   id: number;
@@ -16,7 +17,13 @@ const TodosContainer = () => {
   const dialog = useDialog();
   const [todos, setTodos] = useState<Todo[]>([]);
   const [toggleRefresh, setRefresh] = useState(false);
-  const refresh = () => setRefresh(!toggleRefresh);
+  const [editBoxOpen, setEditBoxOpen] = useState(false);
+  const [editTodo, setEditTodo] = useState<Todo>({
+    id: 0,
+    title: "",
+    done: false
+  });
+  const refreshTodos = () => setRefresh(!toggleRefresh);
 
   const createTodo = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
@@ -27,7 +34,7 @@ const TodosContainer = () => {
         .then(response => {
           setTodos(todos.concat(response.data));
           element.value = "";
-          refresh();
+          refreshTodos();
         })
         .catch(error =>
           dialog.alert("Error, unable to create Todo.\n" + error)
@@ -39,7 +46,7 @@ const TodosContainer = () => {
     axios
       .delete(`/api/v1/todos/${id}`)
       .then(response => {
-        refresh();
+        refreshTodos();
       })
       .catch(error => dialog.alert("Error, unable to delete Todo.\n" + error));
   };
@@ -51,6 +58,28 @@ const TodosContainer = () => {
         window.location.reload();
       })
       .catch(err => dialog.alert("Error, unable to logout.\n" + err));
+  };
+
+  const openEditBox = (id: number, value: string) => {
+    setEditTodo({ id: id, title: value, done: false });
+    setEditBoxOpen(true);
+  };
+
+  const handleEditBoxSave = (title: string) => {
+    setEditBoxOpen(false);
+    axios
+      .put(`/api/v1/todos/${editTodo.id}`, { todo: { title: title } })
+      .then(response => {
+        refreshTodos();
+      })
+      .catch(err => dialog.alert("Error, unable to update Todo\n" + err));
+  };
+
+  const handleEditBoxCancel = () => {
+    dialog
+      .confirm("Are you sure you want to cancel without saving?")
+      .then(() => setEditBoxOpen(false))
+      .catch(() => {});
   };
 
   useEffect(() => {
@@ -89,13 +118,23 @@ const TodosContainer = () => {
               >
                 <DeleteIcon />
               </span>
-              <span className="editTaskBtn" onClick={() => {}}>
+              <span
+                className="editTaskBtn"
+                onClick={() => openEditBox(todo.id, todo.title)}
+              >
                 <EditIcon />
               </span>
             </li>
           );
         })}
       </ul>
+      <EditBox
+        id={editTodo.id}
+        defaultValue={editTodo.title}
+        open={editBoxOpen}
+        save={(s: string) => handleEditBoxSave(s)}
+        cancel={() => handleEditBoxCancel()}
+      />
     </div>
   );
 };
