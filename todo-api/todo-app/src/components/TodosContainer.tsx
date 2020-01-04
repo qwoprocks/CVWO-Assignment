@@ -10,6 +10,7 @@ import EditBox from "./EditBox";
 interface Todo {
   id: number;
   title: string;
+  tags: string[];
   done: boolean;
 }
 
@@ -21,6 +22,7 @@ const TodosContainer = () => {
   const [editTodo, setEditTodo] = useState<Todo>({
     id: 0,
     title: "",
+    tags: [],
     done: false
   });
   const refreshTodos = () => setRefresh(!toggleRefresh);
@@ -67,23 +69,26 @@ const TodosContainer = () => {
       .catch(err => dialog.alert("Error, unable to logout.\n" + err));
   };
 
-  const openEditBox = (id: number, value: string) => {
-    setEditTodo({ id: id, title: value, done: false });
+  const openEditBox = (id: number, value: string, tags: string[]) => {
+    setEditTodo({ id: id, title: value, tags: tags, done: false });
     setEditBoxOpen(true);
   };
 
-  const handleEditBoxSave = (title: string) => {
+  const handleEditBoxSave = (title: string, tags: string[]) => {
     setEditBoxOpen(false);
     axios
-      .put(`/api/v1/todos/${editTodo.id}`, { todo: { title: title } })
+      .put(`/api/v1/todos/${editTodo.id}`, {
+        todo: { title: title, tags: tags }
+      })
       .then(response => {
+        console.log(response);
         refreshTodos();
       })
       .catch(err => dialog.alert("Error, unable to update Todo\n" + err));
   };
 
-  const handleEditBoxCancel = (title: string) => {
-    if (editTodo.title === title) {
+  const handleEditBoxCancel = (hasNotChanged: boolean) => {
+    if (hasNotChanged) {
       setEditBoxOpen(false);
     } else {
       dialog
@@ -130,7 +135,7 @@ const TodosContainer = () => {
               </span>
               <span
                 className="editTaskBtn"
-                onClick={() => openEditBox(todo.id, todo.title)}
+                onClick={() => openEditBox(todo.id, todo.title, todo.tags)}
               >
                 <EditIcon />
               </span>
@@ -140,10 +145,11 @@ const TodosContainer = () => {
       </ul>
       <EditBox
         id={editTodo.id}
-        defaultValue={editTodo.title}
+        defaultTitle={editTodo.title}
+        defaultTags={editTodo.tags}
         open={editBoxOpen}
-        save={(s: string) => handleEditBoxSave(s)}
-        cancel={(s: string) => handleEditBoxCancel(s)}
+        save={(s: string, t: string[]) => handleEditBoxSave(s, t)}
+        cancel={(nc: boolean) => handleEditBoxCancel(nc)}
       />
     </div>
   );

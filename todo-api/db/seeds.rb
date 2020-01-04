@@ -7,3 +7,4 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 Todo.create(title: "Buy stuff", done: false, tags: "shopping")
 Todo.create(title: "clean house", done: false, tags: "home")
+Todo.create(title: "help", tags: ["hmmmm"], done: false, creatorid: 5.0)
