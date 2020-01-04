@@ -83,8 +83,6 @@ const TodosContainer = () => {
   };
 
   const handleEditBoxCancel = (title: string) => {
-    console.log(editTodo.title);
-    console.log(title);
     if (editTodo.title === title) {
       setEditBoxOpen(false);
     } else {
@@ -99,7 +97,6 @@ const TodosContainer = () => {
     axios
       .get(`/api/v1/todos`)
       .then(response => {
-        console.log(response);
         if (response.data !== null) {
           setTodos(response.data);
         }
