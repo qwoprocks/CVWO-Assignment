@@ -4,8 +4,10 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import Checkbox from "@material-ui/core/Checkbox";
 import LogoutButton from "./LogoutButton";
+import { styled } from "@material-ui/core/styles";
 import { useDialog } from "muibox";
 import EditBox from "./EditBox";
+import Chip from "@material-ui/core/Chip";
 
 interface Todo {
   id: number;
@@ -13,6 +15,19 @@ interface Todo {
   tags: string[];
   done: boolean;
 }
+
+const StyledCheckbox = styled(Checkbox)({
+  padding: 0,
+  float: "left",
+  appearance: "none",
+  outline: "none",
+  borderRadius: "10%",
+});
+
+const StyledChip = styled(Chip)({
+  marginLeft: '2px',
+  marginTop: '2px',
+});
 
 const TodosContainer = () => {
   const dialog = useDialog();
@@ -125,20 +140,45 @@ const TodosContainer = () => {
         {todos.map(todo => {
           return (
             <li className="task" value={todo.title} key={todo.id}>
-              <Checkbox />
-              <label className="taskLable">{todo.title}</label>
-              <span
-                className="deleteTaskBtn"
-                onClick={() => deleteTodo(todo.id)}
-              >
-                <DeleteIcon />
-              </span>
-              <span
-                className="editTaskBtn"
-                onClick={() => openEditBox(todo.id, todo.title, todo.tags)}
-              >
-                <EditIcon />
-              </span>
+              <table style={{ width: "100%" }}>
+                <tr>
+                  <th>
+                    <StyledCheckbox />
+                  </th>
+                  <th style={{ textAlign: "left", fontWeight: "normal", width: "70%"}} >
+                    <span>
+                      <label className="taskLable">{todo.title}</label>
+                      <div style={{ fontSize: "0.85em", marginTop: "5px", color: "gray", padding: "0"}}>
+                        <span >Tags:&nbsp;</span>
+                        {todo.tags.length === 0 ? 
+                          "-" : 
+                          todo.tags.map(tag => {
+                            return <StyledChip clickable label={tag} variant="outlined" />;
+                          })
+                        }
+                      </div>
+                    </span>
+                  </th>
+                  <th>
+                    <span
+                      className="editTaskBtn"
+                      onClick={() =>
+                        openEditBox(todo.id, todo.title, todo.tags)
+                      }
+                    >
+                      <EditIcon />
+                    </span>
+                  </th>
+                  <th>
+                    <span
+                      className="deleteTaskBtn"
+                      onClick={() => deleteTodo(todo.id)}
+                    >
+                      <DeleteIcon />
+                    </span>
+                  </th>
+                </tr>
+              </table>
             </li>
           );
         })}

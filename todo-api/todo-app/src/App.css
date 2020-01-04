@@ -73,16 +73,6 @@ li.task {
   border-color: black;
 }
 
-/* This is for the checkbox item */
-.task span:first-child {
-  padding: 0;
-  float: left;
-  -webkit-appearance: none;
-  line-height: 0;
-  outline: none;
-  border-radius: 10%;
-}
-
 .editTaskBtn {
   float: right;
   color: #f50057;

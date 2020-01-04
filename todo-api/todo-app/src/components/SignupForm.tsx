@@ -60,7 +60,9 @@ const SignupForm = () => {
           window.location.reload();
         }
       })
-      .catch(error => "Error, unable to create account.\n" + dialog.alert(error));
+      .catch(
+        error => "Error, unable to create account.\n" + dialog.alert(error)
+      );
   };
 
   return (
