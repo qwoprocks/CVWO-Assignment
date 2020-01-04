@@ -25,6 +25,7 @@ body {
 .inputContainer {
   display: flex;
   flex-flow: column wrap;
+  position: relative;
   align-items: center;
   width: 100%;
   margin-bottom: 40px;

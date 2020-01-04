@@ -8,6 +8,9 @@ import { styled } from "@material-ui/core/styles";
 import { useDialog } from "muibox";
 import EditBox from "./EditBox";
 import Chip from "@material-ui/core/Chip";
+import AddIcon from "@material-ui/icons/Add";
+import Tooltip from "@material-ui/core/Tooltip";
+import AddTodoBox from "./AddTodoBox";
 
 interface Todo {
   id: number;
@@ -29,6 +32,15 @@ const StyledChip = styled(Chip)({
   marginTop: "2px"
 });
 
+const StyledAddIcon = styled(AddIcon)({
+  position: "absolute",
+  right: "10%",
+  top: "25%",
+  "&:hover": {
+    cursor: "pointer"
+  }
+});
+
 const TodosContainer = () => {
   const dialog = useDialog();
   const searchBar: any = useRef(null);
@@ -42,23 +54,29 @@ const TodosContainer = () => {
     tags: [],
     done: false
   });
+  const [addTodoBoxOpen, setAddTodoBoxOpen] = useState(false);
   const refreshTodos = () => setRefresh(!toggleRefresh);
 
-  const createTodo = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      let element = e.currentTarget as HTMLInputElement;
-      let value = element.value;
-      axios
-        .post("/api/v1/todos", { todo: { title: value } })
-        .then(response => {
-          setTodos(todos.concat(response.data));
-          element.value = "";
-          refreshTodos();
-        })
-        .catch(error =>
-          dialog.alert("Error, unable to create Todo.\n" + error)
-        );
-    }
+  const createTodo = (title: string, tags: string[]) => {
+    axios
+      .post("/api/v1/todos", { todo: { title: title, tags: tags } })
+      .then(response => {
+        setTodos(todos.concat(response.data));
+        refreshTodos();
+      })
+      .catch(error => dialog.alert("Error, unable to create Todo.\n" + error));
+  };
+
+  const updateTodo = (id: number, title: string, tags: string[]) => {
+    axios
+      .put(`/api/v1/todos/${id}`, {
+        todo: { title: title, tags: tags }
+      })
+      .then(response => {
+        console.log(response);
+        refreshTodos();
+      })
+      .catch(err => dialog.alert("Error, unable to update Todo\n" + err));
   };
 
   const deleteTodo = (id: number) => {
@@ -86,6 +104,22 @@ const TodosContainer = () => {
       .catch(err => dialog.alert("Error, unable to logout.\n" + err));
   };
 
+  const handleAddTodoBoxSave = (title: string, tags: string[]) => {
+    createTodo(title, tags);
+    setAddTodoBoxOpen(false);
+  };
+
+  const handleAddTodoBoxCancel = (nc: boolean) => {
+    if (nc) {
+      setAddTodoBoxOpen(false);
+    } else {
+      dialog
+        .confirm("Are you sure you want to cancel without saving?")
+        .then(() => setAddTodoBoxOpen(false))
+        .catch(() => {});
+    }
+  };
+
   const openEditBox = (id: number, value: string, tags: string[]) => {
     setEditTodo({ id: id, title: value, tags: tags, done: false });
     setEditBoxOpen(true);
@@ -93,15 +127,7 @@ const TodosContainer = () => {
 
   const handleEditBoxSave = (title: string, tags: string[]) => {
     setEditBoxOpen(false);
-    axios
-      .put(`/api/v1/todos/${editTodo.id}`, {
-        todo: { title: title, tags: tags }
-      })
-      .then(response => {
-        console.log(response);
-        refreshTodos();
-      })
-      .catch(err => dialog.alert("Error, unable to update Todo\n" + err));
+    updateTodo(editTodo.id, title, tags);
   };
 
   const handleEditBoxCancel = (hasNotChanged: boolean) => {
@@ -170,7 +196,14 @@ const TodosContainer = () => {
           placeholder="Search for a task"
           maxLength={50}
           onChange={handleSearch}
-          onKeyPress={createTodo}
+        />
+        <Tooltip title="Add todo" arrow>
+          <StyledAddIcon onClick={() => setAddTodoBoxOpen(true)} />
+        </Tooltip>
+        <AddTodoBox
+          open={addTodoBoxOpen}
+          save={(s: string, t: string[]) => handleAddTodoBoxSave(s, t)}
+          cancel={(nc: boolean) => handleAddTodoBoxCancel(nc)}
         />
       </div>
       <ul className="taskList">
@@ -222,7 +255,9 @@ const TodosContainer = () => {
                         openEditBox(todo.id, todo.title, todo.tags)
                       }
                     >
-                      <EditIcon />
+                      <Tooltip title="Edit" arrow>
+                        <EditIcon />
+                      </Tooltip>
                     </span>
                   </th>
                   <th>
@@ -230,7 +265,9 @@ const TodosContainer = () => {
                       className="deleteTaskBtn"
                       onClick={() => deleteTodo(todo.id)}
                     >
-                      <DeleteIcon />
+                      <Tooltip title="Delete" arrow>
+                        <DeleteIcon />
+                      </Tooltip>
                     </span>
                   </th>
                 </tr>
