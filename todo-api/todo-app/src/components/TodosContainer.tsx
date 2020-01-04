@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
@@ -21,17 +21,19 @@ const StyledCheckbox = styled(Checkbox)({
   float: "left",
   appearance: "none",
   outline: "none",
-  borderRadius: "10%",
+  borderRadius: "10%"
 });
 
 const StyledChip = styled(Chip)({
-  marginLeft: '2px',
-  marginTop: '2px',
+  marginLeft: "2px",
+  marginTop: "2px"
 });
 
 const TodosContainer = () => {
   const dialog = useDialog();
+  const searchBar: any = useRef(null);
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [displayedTodos, setDisplayedTodos] = useState<Todo[]>([]);
   const [toggleRefresh, setRefresh] = useState(false);
   const [editBoxOpen, setEditBoxOpen] = useState(false);
   const [editTodo, setEditTodo] = useState<Todo>({
@@ -113,12 +115,45 @@ const TodosContainer = () => {
     }
   };
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchString = e.target.value.trim();
+    if (searchString === "") {
+      refreshTodos();
+    } else {
+      filterTodos(searchString.split(" "));
+    }
+  };
+
+  const filterTodos = (searchString: string[]) => {
+    console.log(searchString);
+    setDisplayedTodos(
+      todos.filter(todo => {
+        return (
+          searchString.some(word => todo.title.includes(word)) ||
+          todo.tags.find(tag => searchString.some(word => tag.includes(word)))
+        );
+      })
+    );
+  };
+
+  const handleTagClick = (tag: string) => {
+    const currSearchString = searchBar.current.value;
+    if (currSearchString.trim() === "") {
+      searchBar.current.value = tag;
+    } else {
+      searchBar.current.value = currSearchString + " " + tag;
+    }
+    filterTodos(searchBar.current.value);
+    searchBar.current.focus();
+  };
+
   useEffect(() => {
     axios
       .get(`/api/v1/todos`)
       .then(response => {
         if (response.data !== null) {
           setTodos(response.data);
+          setDisplayedTodos(response.data);
         }
       })
       .catch(err => dialog.alert("Error, unable to fetch Todos.\n" + err));
@@ -129,15 +164,17 @@ const TodosContainer = () => {
       <LogoutButton onClick={logout} />
       <div className="inputContainer">
         <input
+          ref={searchBar}
           className="taskInput"
           type="text"
-          placeholder="Add a task"
+          placeholder="Search for a task"
           maxLength={50}
+          onChange={handleSearch}
           onKeyPress={createTodo}
         />
       </div>
       <ul className="taskList">
-        {todos.map(todo => {
+        {displayedTodos.map(todo => {
           return (
             <li className="task" value={todo.title} key={todo.id}>
               <table style={{ width: "100%" }}>
@@ -145,17 +182,36 @@ const TodosContainer = () => {
                   <th>
                     <StyledCheckbox />
                   </th>
-                  <th style={{ textAlign: "left", fontWeight: "normal", width: "70%"}} >
+                  <th
+                    style={{
+                      textAlign: "left",
+                      fontWeight: "normal",
+                      width: "80%"
+                    }}
+                  >
                     <span>
                       <label className="taskLable">{todo.title}</label>
-                      <div style={{ fontSize: "0.85em", marginTop: "5px", color: "gray", padding: "0"}}>
-                        <span >Tags:&nbsp;</span>
-                        {todo.tags.length === 0 ? 
-                          "-" : 
-                          todo.tags.map(tag => {
-                            return <StyledChip clickable label={tag} variant="outlined" />;
-                          })
-                        }
+                      <div
+                        style={{
+                          fontSize: "0.85em",
+                          marginTop: "5px",
+                          color: "gray",
+                          padding: "0"
+                        }}
+                      >
+                        <span>Tags:&nbsp;</span>
+                        {todo.tags.length === 0
+                          ? "-"
+                          : todo.tags.map(tag => {
+                              return (
+                                <StyledChip
+                                  clickable
+                                  onClick={() => handleTagClick(tag)}
+                                  label={tag}
+                                  variant="outlined"
+                                />
+                              );
+                            })}
                       </div>
                     </span>
                   </th>
