@@ -28,44 +28,42 @@ const EditBox = (props: {
   }, [props.defaultTitle, props.defaultTags]);
 
   return (
-    <>
-      <Dialog
-        open={props.open}
-        onClose={() => props.cancel(hasNotChanged())}
-        aria-labelledby="edit-dialog-title"
-        aria-describedby="edit-dialog-description"
-      >
-        <DialogTitle id="edit-dialog-title">Edit</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="edit-dialog-description">
-            <TextField
-              autoFocus
-              fullWidth
-              variant="outlined"
-              id="standard-multiline-static"
-              label="Todo"
-              defaultValue={props.defaultTitle}
-              onChange={e => setTitle(e.target.value)}
-            />
-          </DialogContentText>
-          <DialogContentText id="edit-dialog-chips">
-            <ChipInput
-              label="Tags"
-              defaultValue={props.defaultTags}
-              onChange={(chips: string[]) => setTags(chips)}
-            />
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => props.save(title, tags)} color="primary">
-            Save
-          </Button>
-          <Button onClick={() => props.cancel(hasNotChanged())} color="primary">
-            Cancel
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </>
+    <Dialog
+      open={props.open}
+      onClose={() => props.cancel(hasNotChanged())}
+      aria-labelledby="edit-dialog-title"
+      aria-describedby="edit-dialog-description"
+    >
+      <DialogTitle id="edit-dialog-title">Edit</DialogTitle>
+      <DialogContent>
+        <DialogContentText id="edit-dialog-description">
+          <TextField
+            autoFocus
+            fullWidth
+            variant="outlined"
+            id="standard-multiline-static"
+            label="Todo"
+            defaultValue={props.defaultTitle}
+            onChange={e => setTitle(e.target.value)}
+          />
+        </DialogContentText>
+        <DialogContentText id="edit-dialog-chips">
+          <ChipInput
+            label="Tags"
+            defaultValue={props.defaultTags}
+            onChange={(chips: string[]) => setTags(chips)}
+          />
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => props.save(title, tags)} color="primary">
+          Save
+        </Button>
+        <Button onClick={() => props.cancel(hasNotChanged())} color="primary">
+          Cancel
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

@@ -37,10 +37,6 @@ body {
   border-radius: 8px;
 }
 
-input.taskCheckbox + label.taskLabel {
-  color: black;
-}
-
 input.taskCheckbox:checked + label.taskLabel {
   text-decoration: line-through;
   color: #656565;
@@ -48,73 +44,4 @@ input.taskCheckbox:checked + label.taskLabel {
 
 input[placeholder] {
   font-size: 1.1em;
-}
-
-ul.taskList {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-flow: column wrap;
-  align-items: center;
-}
-
-li.task {
-  display: flex-box;
-  width: 80%;
-  vertical-align: middle;
-  list-style-type: none;
-  font-size: 1.2em;
-  padding: 10px 10px;
-  padding-right: 5px;
-  margin: 5px 0;
-  border-bottom: 1px solid #ccc;
-  background-color: white;
-  border-radius: 5px;
-  border-color: black;
-}
-
-.editTaskBtn {
-  float: right;
-  color: #f50057;
-  background: rgba(0,0,0,0);
-  font-size: 20px;
-  visibility: hidden;
-  opacity: 0;
-  line-height: 0;
-  margin-right: 5px;
-  border-radius: 10%;
-}
-
-.editTaskBtn:hover {
-  background-color: #DDDDDD;
-  cursor: pointer;
-}
-
-.deleteTaskBtn {  
-  float: right;
-  color: #f50057;
-  background: rgba(0,0,0,0);
-  font-size: 20px;
-  visibility: hidden;
-  opacity: 0;
-  line-height: 0;
-  margin-right: 5px;
-  border-radius: 10%;
-}
-
-.deleteTaskBtn:hover {
-  background-color: #DDDDDD;
-  cursor: pointer;
-}
-
-li.task:hover .deleteTaskBtn {
-  visibility: visible;
-  opacity: 1;
-}
-
-
-li.task:hover .editTaskBtn {
-  visibility: visible;
-  opacity: 1;
 }
