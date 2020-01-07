@@ -23,6 +23,6 @@ class TodosController < ApplicationController
 
   private
     def todo_param
-      params.require(:todo).permit(:title, {:tags => []}, :done, :creatorid)
+      params.require(:todo).permit(:id, :created_at, :updated_at, :title, {:tags => []}, :done, :deadline, :creatorid)
     end
 end

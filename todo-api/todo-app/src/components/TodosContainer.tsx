@@ -19,12 +19,15 @@ import ListItemText from "@material-ui/core/ListItemText";
 import IconButton from "@material-ui/core/IconButton";
 import Fab from "@material-ui/core/Fab";
 import SelectAllIcon from "@material-ui/icons/SelectAll";
+import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 
 interface Todo {
   id: number;
   title: string;
   tags: string[];
   done: boolean;
+  deadline: string;
 }
 
 const StyledTaskList = styled(List)({
@@ -74,6 +77,12 @@ const StyledAddIcon = styled(AddIcon)({
   }
 });
 
+const StyledDeadline = styled(props => (
+  <Tooltip classes={{ popper: props.className }} {...props} />
+))({
+  zIndex: 0
+});
+
 const TodosContainer = () => {
   const dialog = useDialog();
   const searchBar: any = useRef(null);
@@ -86,15 +95,18 @@ const TodosContainer = () => {
     id: 0,
     title: "",
     tags: [],
-    done: false
+    done: false,
+    deadline: ""
   });
   const [addTodoBoxOpen, setAddTodoBoxOpen] = useState(false);
   const [selectedTodos, setSelectedTodos] = useState<number[]>([]);
   const refreshTodos = () => setRefresh(!toggleRefresh);
 
-  const createTodo = (title: string, tags: string[]) => {
+  const createTodo = (title: string, tags: string[], deadline: string) => {
     axios
-      .post("/api/v1/todos", { todo: { title: title, tags: tags } })
+      .post("/api/v1/todos", {
+        todo: { title: title, tags: tags, deadline: deadline, done: false }
+      })
       .then(response => {
         setTodos(todos.concat(response.data));
         refreshTodos();
@@ -102,10 +114,10 @@ const TodosContainer = () => {
       .catch(error => dialog.alert("Error, unable to create Todo.\n" + error));
   };
 
-  const updateTodo = (id: number, title: string, tags: string[]) => {
+  const updateTodo = (todo: Todo) => {
     axios
-      .put(`/api/v1/todos/${id}`, {
-        todo: { title: title, tags: tags }
+      .put(`/api/v1/todos/${todo.id}`, {
+        todo
       })
       .then(response => {
         console.log(response);
@@ -125,7 +137,7 @@ const TodosContainer = () => {
 
   const deleteSelectedTodos = () => {
     dialog
-      .confirm("Are you sure you want to delete these Todos?")
+      .confirm("Are you sure you want to permanently delete these Todos?")
       .then(() => {
         selectedTodos.forEach(id => {
           deleteTodo(id);
@@ -144,8 +156,17 @@ const TodosContainer = () => {
       .catch(err => dialog.alert("Error, unable to logout.\n" + err));
   };
 
-  const handleAddTodoBoxSave = (title: string, tags: string[]) => {
-    createTodo(title, tags);
+  const handleAddTodoBoxSave = (
+    title: string,
+    tags: string[],
+    deadlineAdded: boolean,
+    deadline: Date | null
+  ) => {
+    let deadlineString = "";
+    if (deadlineAdded && deadline !== null) {
+      deadlineString = deadline.toLocaleDateString();
+    }
+    createTodo(title, tags, deadlineString);
     setAddTodoBoxOpen(false);
   };
 
@@ -160,23 +181,30 @@ const TodosContainer = () => {
     }
   };
 
-  const handleDeleteTodo = (id: number) => {
-    dialog
-      .confirm("Are you sure you want to delete this Todo?")
-      .then(() => {
-        deleteTodo(id);
-      })
-      .catch(() => {});
-  };
-
-  const openEditBox = (id: number, value: string, tags: string[]) => {
-    setEditTodo({ id: id, title: value, tags: tags, done: false });
+  const openEditBox = (todo: Todo) => {
+    setEditTodo(todo);
     setEditBoxOpen(true);
   };
 
-  const handleEditBoxSave = (title: string, tags: string[]) => {
+  const handleEditBoxSave = (
+    title: string,
+    tags: string[],
+    deadlineAdded: boolean,
+    deadline: Date | null
+  ) => {
+    let deadlineString = "";
+    if (deadlineAdded && deadline !== null) {
+      deadlineString = deadline.toLocaleDateString();
+    }
     setEditBoxOpen(false);
-    updateTodo(editTodo.id, title, tags);
+    const newTodo: Todo = {
+      id: editTodo.id,
+      title: title,
+      done: editTodo.done,
+      tags: tags,
+      deadline: deadlineString
+    };
+    updateTodo(newTodo);
   };
 
   const handleEditBoxCancel = (hasNotChanged: boolean) => {
@@ -188,6 +216,23 @@ const TodosContainer = () => {
         .then(() => setEditBoxOpen(false))
         .catch(() => {});
     }
+  };
+
+  const handleToggleDone = (todo: Todo) => {
+    const newDone: boolean = !todo.done;
+    const newTodo: Todo = {
+      ...todo,
+      done: newDone
+    };
+    updateTodo(newTodo);
+  };
+
+  const toggleDoneSelectedTodos = () => {
+    displayedTodos.forEach(todo => {
+      if (selectedTodos.indexOf(todo.id) !== -1) {
+        handleToggleDone(todo);
+      }
+    });
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -211,14 +256,17 @@ const TodosContainer = () => {
     );
   };
 
-  const handleTagClick = (tag: string) => {
+  const handleTagClick = (e: React.MouseEvent<HTMLDivElement>, tag: string) => {
+    e.stopPropagation();
     const currSearchString = searchBar.current.value;
-    if (currSearchString.trim() === "") {
+    if (currSearchString.split(" ").includes(tag)) {
+      return;
+    } else if (currSearchString.trim() === "") {
       searchBar.current.value = tag;
     } else {
       searchBar.current.value = currSearchString + " " + tag;
     }
-    filterTodos(searchBar.current.value);
+    filterTodos([searchBar.current.value]);
     searchBar.current.focus();
   };
 
@@ -275,7 +323,9 @@ const TodosContainer = () => {
         </Tooltip>
         <AddTodoBox
           open={addTodoBoxOpen}
-          save={(s: string, t: string[]) => handleAddTodoBoxSave(s, t)}
+          save={(s: string, t: string[], da: boolean, deadline: Date | null) =>
+            handleAddTodoBoxSave(s, t, da, deadline)
+          }
           cancel={(nc: boolean) => handleAddTodoBoxCancel(nc)}
         />
       </div>
@@ -287,13 +337,47 @@ const TodosContainer = () => {
         ) : (
           displayedTodos.map(todo => {
             return (
-              <StyledTaskItem key={todo.id} role={undefined} dense button>
+              <StyledTaskItem
+                key={todo.id}
+                role={undefined}
+                onClick={() => handleSelect(todo.id)}
+                dense
+                button
+                style={{
+                  textDecoration: todo.done ? "line-through" : "none",
+                  backgroundColor: todo.done ? "#999999" : "white"
+                }}
+              >
                 <ListItemIcon>
-                  <StyledCheckbox
-                    onChange={() => handleSelect(todo.id)}
-                    checked={selectedTodos.indexOf(todo.id) !== -1}
-                    edge="start"
-                  />
+                  <StyledDeadline
+                    open={todo.deadline !== "" && todo.deadline !== null && !todo.done}
+                    arrow
+                    title={
+                      <React.Fragment>
+                        {new Date(todo.deadline).setHours(0, 0, 0, 0) -
+                          new Date().setHours(0, 0, 0, 0) >=
+                        0 ? (
+                          <>
+                            Due in{" "}
+                            {Math.round(
+                              (new Date(todo.deadline).setHours(0, 0, 0, 0) -
+                                new Date().setHours(0, 0, 0, 0)) /
+                                (1000 * 3600 * 24)
+                            )}{" "}
+                            days.
+                          </>
+                        ) : (
+                          <>{"Overdue!"}</>
+                        )}
+                      </React.Fragment>
+                    }
+                    placement="left"
+                  >
+                    <StyledCheckbox
+                      checked={selectedTodos.indexOf(todo.id) !== -1}
+                      edge="start"
+                    />
+                  </StyledDeadline>
                 </ListItemIcon>
                 <StyledListItemText>
                   <label>{todo.title}</label>
@@ -312,7 +396,7 @@ const TodosContainer = () => {
                           return (
                             <StyledChip
                               clickable
-                              onClick={() => handleTagClick(tag)}
+                              onClick={e => handleTagClick(e, tag)}
                               label={tag}
                               variant="outlined"
                             />
@@ -324,7 +408,7 @@ const TodosContainer = () => {
                   <IconButton
                     edge="end"
                     aria-label="edit"
-                    onClick={() => openEditBox(todo.id, todo.title, todo.tags)}
+                    onClick={() => openEditBox(todo)}
                   >
                     <Tooltip title="Edit" arrow>
                       <EditIcon />
@@ -332,14 +416,16 @@ const TodosContainer = () => {
                   </IconButton>
                   <IconButton
                     edge="end"
-                    aria-label="delete"
-                    onClick={() => handleDeleteTodo(todo.id)}
+                    aria-label="toggle done"
+                    onClick={() => handleToggleDone(todo)}
                   >
-                    <span>
-                      <Tooltip title="Delete" arrow>
-                        <DeleteIcon />
-                      </Tooltip>
-                    </span>
+                    <Tooltip title="Toggle done" arrow>
+                      {todo.done ? (
+                        <CheckCircleIcon />
+                      ) : (
+                        <CheckCircleOutlineIcon />
+                      )}
+                    </Tooltip>
                   </IconButton>
                 </ListItemSecondaryAction>
               </StyledTaskItem>
@@ -351,8 +437,11 @@ const TodosContainer = () => {
         id={editTodo.id}
         defaultTitle={editTodo.title}
         defaultTags={editTodo.tags}
+        defaultDeadline={editTodo.deadline}
         open={editBoxOpen}
-        save={(s: string, t: string[]) => handleEditBoxSave(s, t)}
+        save={(s: string, t: string[], da: boolean, deadline: Date | null) =>
+          handleEditBoxSave(s, t, da, deadline)
+        }
         cancel={(nc: boolean) => handleEditBoxCancel(nc)}
       />
       {selectedTodos.length > 0 ? (
@@ -371,10 +460,22 @@ const TodosContainer = () => {
                 marginRight: "10px"
               }}
               color="primary"
-              aria-label="Delete"
+              aria-label="select all"
               onClick={handleSelectAll}
             >
               <SelectAllIcon />
+            </Fab>
+          </Tooltip>
+          <Tooltip title="Toggle done" arrow>
+            <Fab
+              style={{
+                marginRight: "10px"
+              }}
+              color="primary"
+              aria-label="toggle done"
+              onClick={toggleDoneSelectedTodos}
+            >
+              <CheckCircleIcon />
             </Fab>
           </Tooltip>
           <Tooltip title="Delete" arrow>
