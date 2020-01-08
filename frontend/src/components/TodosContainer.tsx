@@ -437,7 +437,7 @@ const TodosContainer = () => {
         }
       })
       .catch(err => dialog.alert("Error, unable to fetch Todos.\n" + err));
-  }, [dialog, toggleRefresh, sortBy]);
+  }, [dialog, toggleRefresh]);
 
   return (
     <Container
