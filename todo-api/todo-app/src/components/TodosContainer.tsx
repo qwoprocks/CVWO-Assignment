@@ -139,7 +139,7 @@ const TodosContainer = () => {
     null | ((t: Todo) => boolean)
   >(null);
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
-  const [selectedSort, setSelectedSort] = useState('Date created');
+  const [selectedSort, setSelectedSort] = useState('');
   const [sortFunction, setSortFunction] = useState<
     null | ((a: Todo, b: Todo) => number)
   >(null);
@@ -163,7 +163,6 @@ const TodosContainer = () => {
         todo
       })
       .then(response => {
-        console.log(response);
         refreshTodos();
       })
       .catch(err => dialog.alert("Error, unable to update Todo\n" + err));
@@ -310,21 +309,25 @@ const TodosContainer = () => {
 
   const handleSortMenuChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     const value = e.target.value as string;
-    setSelectedSort(value);
-    if (value === "Date created") {
+    sortBy(value);
+  }
+
+  const sortBy = (criteria: string) => {
+    setSelectedSort(criteria);
+    if (criteria === "Date created") {
       setSortFunction(() => dateCreatedSort);
-    } else if (value === "Done status") {
+    } else if (criteria === "Done status") {
       setSortFunction(() => (a: Todo, b: Todo) => {
         const done = doneStatusSort(a, b);
         if (done !== 0) return done;
         return dateCreatedSort(a, b);
       });
-    } else if (value === "Deadline") {
+    } else if (criteria === "Deadline") {
       setSortFunction(() => (a: Todo, b: Todo) => {
         const done = doneStatusSort(a, b);
         if (done !== 0) {
           return done;
-        } 
+        }
         return deadlineSort(a, b);
       });
     }
@@ -332,43 +335,43 @@ const TodosContainer = () => {
   };
 
   const dateCreatedSort = (a: Todo, b: Todo) => {
-      if (new Date(a.created_at).getTime() < new Date(b.created_at).getTime()) {
-        return 1;
-      } else if (
-        new Date(a.created_at).getTime() > new Date(b.created_at).getTime()
-      ) {
-        return -1;
-      }
-      return 0;
+    if (new Date(a.created_at).getTime() < new Date(b.created_at).getTime()) {
+      return 1;
+    } else if (
+      new Date(a.created_at).getTime() > new Date(b.created_at).getTime()
+    ) {
+      return -1;
+    }
+    return 0;
   };
 
   const doneStatusSort = (a: Todo, b: Todo) => {
-      if (a.done && !b.done) {
-        return 1;
-      } else if (b.done && !a.done) {
-        return -1;
-      }
-      return 0;
+    if (a.done && !b.done) {
+      return 1;
+    } else if (b.done && !a.done) {
+      return -1;
+    }
+    return 0;
   };
 
   const deadlineSort = (a: Todo, b: Todo) => {
-      if (a.deadline === "" && b.deadline === "") {
-        return 0;
-      }
-      if (a.deadline === "" && b.deadline !== "") {
-        return 1;
-      } else if (a.deadline !== "" && b.deadline === "") {
-        return -1;
-      }
-
-      if (new Date(a.deadline).getTime() > new Date(b.deadline).getTime()) {
-        return 1;
-      } else if (
-        new Date(a.deadline).getTime() < new Date(b.deadline).getTime()
-      ) {
-        return -1;
-      }
+    if (a.deadline === "" && b.deadline === "") {
       return 0;
+    }
+    if (a.deadline === "" && b.deadline !== "") {
+      return 1;
+    } else if (a.deadline !== "" && b.deadline === "") {
+      return -1;
+    }
+
+    if (new Date(a.deadline).getTime() > new Date(b.deadline).getTime()) {
+      return 1;
+    } else if (
+      new Date(a.deadline).getTime() < new Date(b.deadline).getTime()
+    ) {
+      return -1;
+    }
+    return 0;
   };
 
   const handleSelect = (id: number) => {
@@ -400,20 +403,26 @@ const TodosContainer = () => {
         new Date().setHours(0, 0, 0, 0)) /
         (1000 * 3600 * 24)
     );
-    if (numOfDays >= 0) {
-      return `Due in ${numOfDays} days.`;
-    } else {
+    if (numOfDays < 0) {
       return "Overdue!";
+    } else if (numOfDays == 1) {
+      return `Due in 1 day.`;
+    } else if (numOfDays == 0){
+      return `Due today!`;
+    } else {
+      return `Due in ${numOfDays} days.`;
     }
   };
 
   useEffect(() => {
+    let newTodos = [...todos];
     if (filterFunction !== null) {
-      setDisplayedTodos(todos.filter(filterFunction));
+      newTodos = newTodos.filter(filterFunction);
     }
     if (sortFunction !== null) {
-      setDisplayedTodos(dt => [...dt].sort(sortFunction));
+      newTodos.sort(sortFunction);
     }
+    setDisplayedTodos(newTodos);
   }, [sortFunction, filterFunction, todos]);
 
   useEffect(() => {
@@ -421,8 +430,9 @@ const TodosContainer = () => {
       .get(`/api/v1/todos`)
       .then(response => {
         if (response.data !== null) {
-          setTodos(response.data);
           setDisplayedTodos(response.data);
+          setTodos(response.data);
+          sortBy("Deadline");
           setLoading(false);
         }
       })
