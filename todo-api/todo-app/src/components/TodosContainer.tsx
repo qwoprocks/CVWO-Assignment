@@ -405,9 +405,9 @@ const TodosContainer = () => {
     );
     if (numOfDays < 0) {
       return "Overdue!";
-    } else if (numOfDays == 1) {
+    } else if (numOfDays === 1) {
       return `Due in 1 day.`;
-    } else if (numOfDays == 0){
+    } else if (numOfDays === 0){
       return `Due today!`;
     } else {
       return `Due in ${numOfDays} days.`;
@@ -437,7 +437,7 @@ const TodosContainer = () => {
         }
       })
       .catch(err => dialog.alert("Error, unable to fetch Todos.\n" + err));
-  }, [dialog, toggleRefresh]);
+  }, [dialog, toggleRefresh, sortBy]);
 
   return (
     <Container
