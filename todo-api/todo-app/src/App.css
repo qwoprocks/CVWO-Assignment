@@ -15,33 +15,3 @@ body {
   color: #AAAAAA;
   cursor: default;
 }
-
-.container {
-  display: block;
-  width: 55%;
-  margin: 0 auto;
-}
-
-.inputContainer {
-  display: flex;
-  flex-flow: column wrap;
-  position: relative;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 40px;
-}
-
-.taskInput {
-  width: 80%;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-input.taskCheckbox:checked + label.taskLabel {
-  text-decoration: line-through;
-  color: #656565;
-}
-
-input[placeholder] {
-  font-size: 1.1em;
-}

@@ -21,6 +21,13 @@ import Fab from "@material-ui/core/Fab";
 import SelectAllIcon from "@material-ui/icons/SelectAll";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import FormControl from "@material-ui/core/FormControl";
+import OutlinedInput from "@material-ui/core/OutlinedInput";
+import InputAdornment from "@material-ui/core/InputAdornment";
+import Container from "@material-ui/core/Container";
+import SortIcon from "@material-ui/icons/Sort";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 
 interface Todo {
   id: number;
@@ -28,6 +35,7 @@ interface Todo {
   tags: string[];
   done: boolean;
   deadline: string;
+  created_at: string;
 }
 
 const StyledTaskList = styled(List)({
@@ -67,20 +75,46 @@ const StyledChip = styled(Chip)({
 });
 
 const StyledAddIcon = styled(AddIcon)({
-  position: "absolute",
-  right: "10%",
-  top: "25%",
-  borderRadius: "2px",
+  marginRight: "8px",
   "&:hover": {
     cursor: "pointer",
     backgroundColor: "#DDDDDD"
   }
 });
 
-const StyledDeadline = styled(props => (
-  <Tooltip classes={{ popper: props.className }} {...props} />
+const StyledSortIcon = styled(SortIcon)({
+  marginRight: "2px",
+  "&:hover": {
+    cursor: "pointer",
+    backgroundColor: "#DDDDDD"
+  }
+});
+
+const StyledDeadline = styled(({ overdue, ...props }) => (
+  <Tooltip
+    classes={{ popper: props.className, tooltip: "tooltip", arrow: "arrow" }}
+    {...props}
+  />
 ))({
-  zIndex: 0
+  zIndex: 0,
+  "& .arrow": {
+    color: props => (props.overdue ? "red" : "")
+  },
+  "& .tooltip": {
+    fontSize: "0.75em",
+    backgroundColor: props => (props.overdue ? "red" : "")
+  }
+});
+
+const StyledSortMenu = styled(Select)({
+  "& #select": {
+    visibility: "hidden",
+    minWidth: 0,
+    padding: 0,
+    margin: 0,
+    width: 0,
+    height: 0
+  }
 });
 
 const TodosContainer = () => {
@@ -96,10 +130,19 @@ const TodosContainer = () => {
     title: "",
     tags: [],
     done: false,
-    deadline: ""
+    deadline: "",
+    created_at: ""
   });
   const [addTodoBoxOpen, setAddTodoBoxOpen] = useState(false);
   const [selectedTodos, setSelectedTodos] = useState<number[]>([]);
+  const [filterFunction, setFilterFunction] = useState<
+    null | ((t: Todo) => boolean)
+  >(null);
+  const [sortMenuOpen, setSortMenuOpen] = useState(false);
+  const [selectedSort, setSelectedSort] = useState('Date created');
+  const [sortFunction, setSortFunction] = useState<
+    null | ((a: Todo, b: Todo) => number)
+  >(null);
   const refreshTodos = () => setRefresh(!toggleRefresh);
 
   const createTodo = (title: string, tags: string[], deadline: string) => {
@@ -202,7 +245,8 @@ const TodosContainer = () => {
       title: title,
       done: editTodo.done,
       tags: tags,
-      deadline: deadlineString
+      deadline: deadlineString,
+      created_at: editTodo.created_at
     };
     updateTodo(newTodo);
   };
@@ -237,23 +281,7 @@ const TodosContainer = () => {
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchString = e.target.value.trim();
-    if (searchString === "") {
-      refreshTodos();
-    } else {
-      filterTodos(searchString.split(" "));
-    }
-  };
-
-  const filterTodos = (searchString: string[]) => {
-    console.log(searchString);
-    setDisplayedTodos(
-      todos.filter(todo => {
-        return (
-          searchString.some(word => todo.title.includes(word)) ||
-          todo.tags.find(tag => searchString.some(word => tag.includes(word)))
-        );
-      })
-    );
+    filterTodos(searchString.split(" "));
   };
 
   const handleTagClick = (e: React.MouseEvent<HTMLDivElement>, tag: string) => {
@@ -266,8 +294,81 @@ const TodosContainer = () => {
     } else {
       searchBar.current.value = currSearchString + " " + tag;
     }
-    filterTodos([searchBar.current.value]);
+    filterTodos(searchBar.current.value.split(" "));
     searchBar.current.focus();
+  };
+
+  const filterTodos = (searchString: string[]) => {
+    setFilterFunction(() => (todo: Todo) => {
+      if (searchString === [""]) return true;
+      return Boolean(
+        searchString.some(word => todo.title.includes(word)) ||
+          todo.tags.find(tag => searchString.some(word => tag.includes(word)))
+      );
+    });
+  };
+
+  const handleSortMenuChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+    const value = e.target.value as string;
+    setSelectedSort(value);
+    if (value === "Date created") {
+      setSortFunction(() => dateCreatedSort);
+    } else if (value === "Done status") {
+      setSortFunction(() => (a: Todo, b: Todo) => {
+        const done = doneStatusSort(a, b);
+        if (done !== 0) return done;
+        return dateCreatedSort(a, b);
+      });
+    } else if (value === "Deadline") {
+      setSortFunction(() => (a: Todo, b: Todo) => {
+        const done = doneStatusSort(a, b);
+        if (done !== 0) {
+          return done;
+        } 
+        return deadlineSort(a, b);
+      });
+    }
+    setSortMenuOpen(false);
+  };
+
+  const dateCreatedSort = (a: Todo, b: Todo) => {
+      if (new Date(a.created_at).getTime() < new Date(b.created_at).getTime()) {
+        return 1;
+      } else if (
+        new Date(a.created_at).getTime() > new Date(b.created_at).getTime()
+      ) {
+        return -1;
+      }
+      return 0;
+  };
+
+  const doneStatusSort = (a: Todo, b: Todo) => {
+      if (a.done && !b.done) {
+        return 1;
+      } else if (b.done && !a.done) {
+        return -1;
+      }
+      return 0;
+  };
+
+  const deadlineSort = (a: Todo, b: Todo) => {
+      if (a.deadline === "" && b.deadline === "") {
+        return 0;
+      }
+      if (a.deadline === "" && b.deadline !== "") {
+        return 1;
+      } else if (a.deadline !== "" && b.deadline === "") {
+        return -1;
+      }
+
+      if (new Date(a.deadline).getTime() > new Date(b.deadline).getTime()) {
+        return 1;
+      } else if (
+        new Date(a.deadline).getTime() < new Date(b.deadline).getTime()
+      ) {
+        return -1;
+      }
+      return 0;
   };
 
   const handleSelect = (id: number) => {
@@ -293,6 +394,28 @@ const TodosContainer = () => {
     }
   };
 
+  const checkIfOverdue = (deadline: string) => {
+    const numOfDays = Math.round(
+      (new Date(deadline).setHours(0, 0, 0, 0) -
+        new Date().setHours(0, 0, 0, 0)) /
+        (1000 * 3600 * 24)
+    );
+    if (numOfDays >= 0) {
+      return `Due in ${numOfDays} days.`;
+    } else {
+      return "Overdue!";
+    }
+  };
+
+  useEffect(() => {
+    if (filterFunction !== null) {
+      setDisplayedTodos(todos.filter(filterFunction));
+    }
+    if (sortFunction !== null) {
+      setDisplayedTodos(dt => [...dt].sort(sortFunction));
+    }
+  }, [sortFunction, filterFunction, todos]);
+
   useEffect(() => {
     axios
       .get(`/api/v1/todos`)
@@ -307,70 +430,94 @@ const TodosContainer = () => {
   }, [dialog, toggleRefresh]);
 
   return (
-    <div className="container">
+    <Container
+      style={{ width: "60%", minWidth: "400px", marginBottom: "35px" }}
+      maxWidth="md"
+    >
       <LogoutButton onClick={logout} />
-      <div className="inputContainer">
-        <input
-          ref={searchBar}
-          className="taskInput"
+      <FormControl
+        style={{
+          backgroundColor: "white",
+          borderRadius: "10px",
+          marginBottom: "35px"
+        }}
+        fullWidth
+        variant="outlined"
+      >
+        <OutlinedInput
+          inputRef={searchBar}
+          notched={false}
+          id="outlined-adornment-search"
           type="text"
-          placeholder="Search for a task"
-          maxLength={50}
           onChange={handleSearch}
-        />
-        <Tooltip title="Add todo" arrow>
-          <StyledAddIcon onClick={() => setAddTodoBoxOpen(true)} />
-        </Tooltip>
-        <AddTodoBox
-          open={addTodoBoxOpen}
-          save={(s: string, t: string[], da: boolean, deadline: Date | null) =>
-            handleAddTodoBoxSave(s, t, da, deadline)
+          placeholder="Search for a task"
+          labelWidth={60}
+          endAdornment={
+            <InputAdornment position="end">
+              <Tooltip title="Add todo" arrow>
+                <StyledAddIcon onClick={() => setAddTodoBoxOpen(true)} />
+              </Tooltip>
+              <StyledSortMenu
+                disableUnderline
+                labelId="label"
+                id="select"
+                value={selectedSort}
+                IconComponent={() => (
+                  <Tooltip title="Sort by" arrow>
+                    <StyledSortIcon onClick={() => setSortMenuOpen(true)} />
+                  </Tooltip>
+                )}
+                open={sortMenuOpen}
+                onClose={() => setSortMenuOpen(false)}
+                onChange={handleSortMenuChange}
+              >
+                <MenuItem value="Date created">Date created</MenuItem>
+                <MenuItem value="Done status">Done status</MenuItem>
+                <MenuItem value="Deadline">Deadline</MenuItem>
+              </StyledSortMenu>
+            </InputAdornment>
           }
-          cancel={(nc: boolean) => handleAddTodoBoxCancel(nc)}
         />
-      </div>
+      </FormControl>
+      <AddTodoBox
+        open={addTodoBoxOpen}
+        save={(s: string, t: string[], da: boolean, deadline: Date | null) =>
+          handleAddTodoBoxSave(s, t, da, deadline)
+        }
+        cancel={(nc: boolean) => handleAddTodoBoxCancel(nc)}
+      />
       <StyledTaskList>
         {loading ? (
           <div />
-        ) : displayedTodos.length === 0 ? (
+        ) : todos.length === 0 ? (
           <div>You have no todos currently.</div>
         ) : (
           displayedTodos.map(todo => {
             return (
               <StyledTaskItem
                 key={todo.id}
-                role={undefined}
                 onClick={() => handleSelect(todo.id)}
                 dense
                 button
                 style={{
                   textDecoration: todo.done ? "line-through" : "none",
-                  backgroundColor: todo.done ? "#999999" : "white"
+                  backgroundColor: todo.done
+                    ? "#888888"
+                    : selectedTodos.indexOf(todo.id) === -1
+                    ? "white"
+                    : "#CCCCCC"
                 }}
               >
                 <ListItemIcon>
                   <StyledDeadline
-                    open={todo.deadline !== "" && todo.deadline !== null && !todo.done}
-                    arrow
-                    title={
-                      <React.Fragment>
-                        {new Date(todo.deadline).setHours(0, 0, 0, 0) -
-                          new Date().setHours(0, 0, 0, 0) >=
-                        0 ? (
-                          <>
-                            Due in{" "}
-                            {Math.round(
-                              (new Date(todo.deadline).setHours(0, 0, 0, 0) -
-                                new Date().setHours(0, 0, 0, 0)) /
-                                (1000 * 3600 * 24)
-                            )}{" "}
-                            days.
-                          </>
-                        ) : (
-                          <>{"Overdue!"}</>
-                        )}
-                      </React.Fragment>
+                    open={
+                      todo.deadline !== "" &&
+                      todo.deadline !== null &&
+                      !todo.done
                     }
+                    arrow
+                    overdue={checkIfOverdue(todo.deadline) === "Overdue!"}
+                    title={checkIfOverdue(todo.deadline)}
                     placement="left"
                   >
                     <StyledCheckbox
@@ -489,9 +636,9 @@ const TodosContainer = () => {
           </Tooltip>
         </div>
       ) : (
-        <></>
+        ""
       )}
-    </div>
+    </Container>
   );
 };
 

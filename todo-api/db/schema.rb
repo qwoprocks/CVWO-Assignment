@@ -10,19 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_07_140713) do
+ActiveRecord::Schema.define(version: 2020_01_08_133812) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "todos", force: :cascade do |t|
     t.string "title"
-    t.boolean "done"
+    t.boolean "done", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.decimal "creatorid"
     t.string "tags", default: [], array: true
-    t.string "deadline"
+    t.string "deadline", default: ""
     t.index ["tags"], name: "index_todos_on_tags", using: :gin
   end
 
