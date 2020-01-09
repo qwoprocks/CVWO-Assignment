@@ -2,7 +2,7 @@ Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
   
   # Allow front end to make requests
-  #config.allowed_cors_origins = ["http://localhost:3000"]
+  config.allowed_cors_origins = ["http://localhost:3000"]
   config.hosts << "test-cvwo-assignment.herokuapp.com"
 
   # In the development environment your application's code is reloaded on
