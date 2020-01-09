@@ -21,7 +21,12 @@ class SessionController < ApplicationController
     end
 
     def is_logged_in?
-        @current_user ||= User.find(session[:userid]) if session[:userid]
+        begin
+            @current_user ||= User.find(session[:userid]) if session[:userid]
+        rescue ActiveRecord::RecordNotFound => e
+            destroy
+            return
+        end
         if @current_user
             render json: {
                 logged_in: true,

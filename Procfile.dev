@@ -1,2 +1,2 @@
-web: PORT=3001 yarn --cwd frontend start
+web: cd ./frontend && PORT=3001 npm run start
 api: cd ./backend && PORT=3000 bundle exec rails server

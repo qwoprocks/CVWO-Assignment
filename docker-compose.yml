@@ -26,7 +26,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     working_dir: /todoapp/frontend
-    command: "yarn start"
+    command: "npm run start"
     #volumes:
     #  - ./frontend:/todoapp/frontend
     #  - ./frontend/node_modules:/todoapp/frontend/node_modules
