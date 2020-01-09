@@ -1,5 +1,5 @@
 {
   "scripts": {
-    "heroku-postbuild": "yarn --cwd frontend start && yarn --cwd frontend build"
+    "heroku-postbuild": "cd ./frontend && npm install && npm run start && npm run build"
   }
 }
