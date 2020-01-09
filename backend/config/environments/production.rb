@@ -3,7 +3,7 @@ Rails.application.configure do
 
   # Allow front end to make requests
   # config.allowed_cors_origins = ["http://localhost:4000"]
-  config.hosts << "my-cvwo-assignment.herokuapp.com"
+  config.hosts << "test-cvwo-assignment.herokuapp.com"
   config.assets.complie = true
   config.serve_static_assests = true
 
