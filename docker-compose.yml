@@ -2,28 +2,35 @@ version: '3'
 services:
   db:
     image: postgres
-    #ports:
+    ports:
       - "5432:5432"
     volumes:
       - ./tmp/db:/var/lib/postgresql/data
   backend:
-    build: ./backend
+    image: cwvo-assignment_backend:latest
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    working_dir: /todoapp/backend
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     #command: bundle exec rails s -p 3000 -b '0.0.0.0'
-    volumes:
-      - ./backend:/todoapp/backend
+    #volumes:
+    #  - ./backend:/todoapp/backend
     ports:
-      - "3001:3000"
+      - "3000:3000"
     depends_on:
       - db
   frontend:
-    image: "node:10"
-    user: "node"
+    image: cwvo-assignment_frontend:latest
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
     working_dir: /todoapp/frontend
-    volumes:
-      - ./frontend:/todoapp/frontend
-    ports:
-      - "3000:3000"
     command: "yarn start"
+    #volumes:
+    #  - ./frontend:/todoapp/frontend
+    #  - ./frontend/node_modules:/todoapp/frontend/node_modules
+    ports:
+      - "4000:4000"
     depends_on:
       - backend

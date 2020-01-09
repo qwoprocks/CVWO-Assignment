@@ -32,10 +32,17 @@ const AddTodoBox = (props: {
 
   const hasNotChanged = () => title.trim() === "" && tags.length === 0;
 
+  useEffect(() => {
+    setDeadlineAdded(false);
+    setSelectedDate(new Date());
+    setTags([]);
+    setTitle("");
+  }, [])
+
   return (
     <Dialog
       open={props.open}
-      onClose={() => props.cancel(hasNotChanged())}
+      onClose={() => {props.cancel(hasNotChanged())}
       aria-labelledby="add-dialog-title"
       aria-describedby="add-dialog-description"
     >
