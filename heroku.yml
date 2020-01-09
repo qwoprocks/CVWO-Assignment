@@ -9,5 +9,5 @@ build:
   config:
     RAILS_ENV: development
 run:
-  web: PORT=$PORT npm install -g serve && serve -s build
+  web: npm install -g serve && serve -s build
   api: bundle exec rails server -b 0.0.0.0
