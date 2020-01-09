@@ -9,4 +9,5 @@ build:
   config:
     RAILS_ENV: development
 run:
+  web: npm run start
   api: bundle exec puma -t 5:5 -p ${PORT:-3001} -e ${RACK_ENV:-development}
