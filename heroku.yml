@@ -9,5 +9,5 @@ build:
   config:
     RAILS_ENV: development
 run:
-  web: PORT=3000 npm run build
+  web: PORT=$PORT npm run build
   api: bundle exec rails server
