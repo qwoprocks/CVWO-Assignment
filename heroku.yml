@@ -10,4 +10,4 @@ build:
     RAILS_ENV: development
 run:
   web: PORT=$PORT npm run build
-  api: bundle exec rails server
+  api: bundle exec rails server -t 5:5 -p ${PORT:-3001} -e ${RACK_ENV:-development}
