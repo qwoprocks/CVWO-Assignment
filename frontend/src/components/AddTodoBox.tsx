@@ -1,5 +1,5 @@
 import "date-fns";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -37,12 +37,12 @@ const AddTodoBox = (props: {
     setSelectedDate(new Date());
     setTags([]);
     setTitle("");
-  }, [])
+  }, []);
 
   return (
     <Dialog
       open={props.open}
-      onClose={() => {props.cancel(hasNotChanged())}
+      onClose={() => props.cancel(hasNotChanged())}
       aria-labelledby="add-dialog-title"
       aria-describedby="add-dialog-description"
     >
@@ -80,7 +80,7 @@ const AddTodoBox = (props: {
                   </Tooltip>
                 )
               }
-              onClick={() => setDeadlineAdded(!deadlineAdded)} 
+              onClick={() => setDeadlineAdded(!deadlineAdded)}
               aria-controls="add-deadline-content"
               id="add-deadline-header"
             >
@@ -94,7 +94,9 @@ const AddTodoBox = (props: {
                   label="Deadline picker"
                   format="MM/dd/yyyy"
                   value={selectedDate}
-                  onChange={date => {setSelectedDate(date)}}
+                  onChange={date => {
+                    setSelectedDate(date);
+                  }}
                   KeyboardButtonProps={{
                     "aria-label": "change date"
                   }}
@@ -105,7 +107,10 @@ const AddTodoBox = (props: {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => props.save(title, tags, deadlineAdded, selectedDate)} color="primary">
+        <Button
+          onClick={() => props.save(title, tags, deadlineAdded, selectedDate)}
+          color="primary"
+        >
           Save
         </Button>
         <Button onClick={() => props.cancel(hasNotChanged())} color="primary">

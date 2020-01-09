@@ -7,6 +7,6 @@ ENV PATH /todoapp/frontend/node_modules/.bin:$PATH
 RUN npm install -g yarn
 COPY . /todoapp/frontend
 RUN yarn install
-EXPOSE 4000
+EXPOSE 3001
 
 CMD ["yarn", "start"]

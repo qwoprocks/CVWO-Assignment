@@ -3,6 +3,7 @@ Rails.application.configure do
 
   # Allow front end to make requests
   # config.allowed_cors_origins = ["http://localhost:4000"]
+  config.hosts << "my-cvwo-assignment.herokuapp.com"
 
   # Code is not reloaded between requests.
   config.cache_classes = true
