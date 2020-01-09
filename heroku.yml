@@ -8,6 +8,6 @@ build:
     api: backend/Dockerfile
   config:
     RAILS_ENV: development
-#run:
-#  web: PORT=3001 yarn --cwd frontend start
-#  api: cd ./backend && PORT=3000 bundle exec rails server
+run:
+  web: PORT=$PORT npm run start
+  api: bundle exec rails server -b 0.0.0.0:$PORT
