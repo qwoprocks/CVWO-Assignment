@@ -11,8 +11,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        dockermachineip: "192.168.99.100"
     working_dir: /todoapp/backend
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3001 -b '0.0.0.0'"
     ports:
@@ -24,6 +22,8 @@ services:
     build: 
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        dockermachineip: "192.168.99.100"
     working_dir: /todoapp/frontend
     command: "yarn start"
     ports:
