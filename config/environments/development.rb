@@ -3,7 +3,6 @@ Rails.application.configure do
   
   # Allow front end to make requests
   config.allowed_cors_origins = ["http://localhost:3000"]
-  config.hosts << "test-cvwo-assignment.herokuapp.com"
 
   # In the development environment your application's code is reloaded on
   # every request. This slows down response time but is perfect for development
