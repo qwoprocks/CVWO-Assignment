@@ -44,6 +44,10 @@ const SignupForm = () => {
       dialog.alert("Passwords do not match");
       return;
     }
+    if (e.currentTarget.password.value.length < 8) {
+      dialog.alert("Password must be at least 8 characters long");
+      return;
+    }
     axios
       .post("/api/v1/users", {
         user: {
