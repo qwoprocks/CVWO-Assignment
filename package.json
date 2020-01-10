@@ -2,7 +2,6 @@
   "name": "todoapp",
   "version": "1.0.0",
   "description": "A Todo App.",
-  "author": "Yarn Contributor",
   "license": "MIT",
   "scripts": {
     "build": "cd frontend && yarn install && yarn build && cd ..",
