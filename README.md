@@ -17,3 +17,16 @@ docker-compose up
 ```
 
 The app will then be running on **http://{dockermachineip}:3000**.
+
+# Troubleshooting
+1. Try stopping and pruning all images and containers in docker.
+```
+docker container stop {containerids}
+docker system prune -a
+```
+Then restart docker.
+
+2. Try disabling autocrlf if you are not on windows
+```
+git config --global core.autocrlf false
+```
