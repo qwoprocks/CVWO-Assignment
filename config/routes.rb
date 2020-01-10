@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  get '*path', to: "application#fallback_index_html", constraints: ->(request) do
+    !request.xhr? && request.format.html?
+  end
   scope '/api/v1' do
       resources :todos
       resources :session

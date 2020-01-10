@@ -8,9 +8,7 @@ services:
       - ./tmp/db:/var/lib/postgresql/data
   backend:
     image: cwvo-assignment_backend:latest
-    build: 
-      context: ./backend
-      dockerfile: Dockerfile
+    build: .
     working_dir: /todoapp/backend
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3001 -b '0.0.0.0'"
     #command: bundle exec rails s -p 3000 -b '0.0.0.0'
