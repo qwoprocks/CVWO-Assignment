@@ -1,5 +1,5 @@
 import "date-fns";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -32,16 +32,17 @@ const AddTodoBox = (props: {
 
   const hasNotChanged = () => title.trim() === "" && tags.length === 0;
 
-  useEffect(() => {
+  const reset = () => {
     setDeadlineAdded(false);
     setSelectedDate(new Date());
     setTags([]);
     setTitle("");
-  }, []);
+  };
 
   return (
     <Dialog
       open={props.open}
+      onEnter={reset}
       onClose={() => props.cancel(hasNotChanged())}
       aria-labelledby="add-dialog-title"
       aria-describedby="add-dialog-description"
