@@ -16,7 +16,7 @@ docker-compose run backend rake db:migrate
 docker-compose up
 ```
 
-The app will then be running on **http://{dockermachineip}:3000**.
+The app will then be running on **http://{dockermachineip}:3000**. It may take a while to load so be patient.
 
 # Troubleshooting
 1. Try stopping and pruning all images and containers in docker.
@@ -26,7 +26,7 @@ docker system prune -a
 ```
 Then restart docker.
 
-2. Try disabling autocrlf if you are not on windows
+2. Try disabling autocrlf and re-cloning the repo.
 ```
 git config --global core.autocrlf false
 ```
