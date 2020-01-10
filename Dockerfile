@@ -13,5 +13,7 @@ RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 EXPOSE 3001
 
+ENV RAILS_HOST=db
+
 # Start the main process.
 CMD ["bundle", "exec", "rails", "server", "-p", "3001", "-b", "0.0.0.0"]
