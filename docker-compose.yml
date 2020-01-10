@@ -23,6 +23,8 @@ services:
     build: 
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        proxy: 192.168.99.100:3001
     working_dir: /todoapp/frontend
     command: "npm run start"
     #volumes:
