@@ -139,7 +139,7 @@ const TodosContainer = () => {
     null | ((t: Todo) => boolean)
   >(null);
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
-  const [selectedSort, setSelectedSort] = useState('');
+  const [selectedSort, setSelectedSort] = useState("");
   const [sortFunction, setSortFunction] = useState<
     null | ((a: Todo, b: Todo) => number)
   >(null);
@@ -310,7 +310,7 @@ const TodosContainer = () => {
   const handleSortMenuChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     const value = e.target.value as string;
     sortBy(value);
-  }
+  };
 
   const sortBy = (criteria: string) => {
     setSelectedSort(criteria);
@@ -407,7 +407,7 @@ const TodosContainer = () => {
       return "Overdue!";
     } else if (numOfDays === 1) {
       return `Due in 1 day.`;
-    } else if (numOfDays === 0){
+    } else if (numOfDays === 0) {
       return `Due today!`;
     } else {
       return `Due in ${numOfDays} days.`;
@@ -460,7 +460,7 @@ const TodosContainer = () => {
           id="outlined-adornment-search"
           type="text"
           onChange={handleSearch}
-          placeholder="Search for a task"
+          placeholder="Search for a todo"
           labelWidth={60}
           endAdornment={
             <InputAdornment position="end">
@@ -500,7 +500,7 @@ const TodosContainer = () => {
         {loading ? (
           <div />
         ) : todos.length === 0 ? (
-          <div>You have no todos currently.</div>
+          <div style={{ color: "#DDDDDD" }}>You have no todos currently.</div>
         ) : (
           displayedTodos.map(todo => {
             return (
