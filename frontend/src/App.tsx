@@ -32,9 +32,10 @@ const App: React.FC<Props> = props => {
         dispatch(getSession()).then(() => {
             setDoneLoading(true);
         }).catch((err: string) => {
-            dialog.alert("Error, unable to get user.\n" + err);
+            dialog.alert("Error, unable to fetch user.\n" + err);
         });
-    }, [dispatch]);
+    // eslint-disable-next-line
+    }, []);
 
     useEffect(() => {
         setLoggedIn(session.logged_in);

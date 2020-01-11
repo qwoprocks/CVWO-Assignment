@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -29,6 +28,14 @@ import SortIcon from "@material-ui/icons/Sort";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import { connect } from "react-redux";
+import {
+  createTodo,
+  updateTodo,
+  deleteTodo,
+  fetchTodos,
+  fetchTags,
+  sessionLogout
+} from "../actions/index";
 
 interface Todo {
   id: number;
@@ -118,11 +125,18 @@ const StyledSortMenu = styled(Select)({
   }
 });
 
-const TodosContainer = () => {
+type Props = {
+    dispatch: any;
+    todos: Todo[];
+    tags: string[];
+};
+
+const TodosContainer: React.FC<Props> = props => {
+  const { dispatch, todos, tags } = props;
+
   const dialog = useDialog();
   const searchBar: any = useRef(null);
   const [loading, setLoading] = useState(true);
-  const [todos, setTodos] = useState<Todo[]>([]);
   const [tagList, setTagList] = useState<Object[]>([]);
   const [displayedTodos, setDisplayedTodos] = useState<Todo[]>([]);
   const [toggleRefresh, setRefresh] = useState(false);
@@ -147,36 +161,32 @@ const TodosContainer = () => {
   >(null);
   const refreshTodos = () => setRefresh(!toggleRefresh);
 
-  const createTodo = (title: string, tags: string[], deadline: string) => {
-    axios
-      .post("/api/v1/todos", {
-        todo: { title: title, tags: tags, deadline: deadline, done: false }
-      })
-      .then(response => {
-        setTodos(todos.concat(response.data));
-        refreshTodos();
-      })
-      .catch(error => dialog.alert("Error, unable to create Todo.\n" + error));
+  const handleCreateTodo = (
+    title: string,
+    tags: string[],
+    deadline: string
+  ) => {
+    dispatch(createTodo(title, tags, deadline))
+      .then(() => refreshTodos())
+      .catch((err: string) =>
+        dialog.alert("Error, unable to create Todo. " + err)
+      );
   };
 
-  const updateTodo = (todo: Todo) => {
-    axios
-      .put(`/api/v1/todos/${todo.id}`, {
-        todo
-      })
-      .then(response => {
-        refreshTodos();
-      })
-      .catch(err => dialog.alert("Error, unable to update Todo\n" + err));
+  const handleUpdateTodo = (todo: Todo) => {
+    dispatch(updateTodo(todo))
+      .then(() => refreshTodos())
+      .catch((err: string) =>
+        dialog.alert("Error, unable to update Todo. " + err)
+      );
   };
 
-  const deleteTodo = (id: number) => {
-    axios
-      .delete(`/api/v1/todos/${id}`)
-      .then(response => {
-        refreshTodos();
-      })
-      .catch(error => dialog.alert("Error, unable to delete Todo.\n" + error));
+  const handleDeleteTodo = (id: number) => {
+    dispatch(deleteTodo(id))
+      .then(() => refreshTodos())
+      .catch((err: string) =>
+        dialog.alert("Error, unable to delete Todo. " + err)
+      );
   };
 
   const deleteSelectedTodos = () => {
@@ -184,7 +194,7 @@ const TodosContainer = () => {
       .confirm("Are you sure you want to permanently delete these Todos?")
       .then(() => {
         selectedTodos.forEach(id => {
-          deleteTodo(id);
+          handleDeleteTodo(id);
         });
         setSelectedTodos([]);
       })
@@ -192,12 +202,9 @@ const TodosContainer = () => {
   };
 
   const logout = () => {
-    axios
-      .delete("/api/v1/session/0")
-      .then(response => {
-        window.location.reload();
-      })
-      .catch(err => dialog.alert("Error, unable to logout.\n" + err));
+    dispatch(sessionLogout()).catch((err: string) =>
+      dialog.alert("Error, unable to logout. " + err)
+    );
   };
 
   const handleAddTodoBoxSave = (
@@ -210,7 +217,7 @@ const TodosContainer = () => {
     if (deadlineAdded && deadline !== null) {
       deadlineString = deadline.toLocaleDateString();
     }
-    createTodo(title, tags, deadlineString);
+    handleCreateTodo(title, tags, deadlineString);
     setAddTodoBoxOpen(false);
   };
 
@@ -249,7 +256,7 @@ const TodosContainer = () => {
       deadline: deadlineString,
       created_at: editTodo.created_at
     };
-    updateTodo(newTodo);
+    handleUpdateTodo(newTodo);
   };
 
   const handleEditBoxCancel = (hasNotChanged: boolean) => {
@@ -269,7 +276,7 @@ const TodosContainer = () => {
       ...todo,
       done: newDone
     };
-    updateTodo(newTodo);
+    handleUpdateTodo(newTodo);
   };
 
   const toggleDoneSelectedTodos = () => {
@@ -428,32 +435,31 @@ const TodosContainer = () => {
   }, [sortFunction, filterFunction, todos]);
 
   useEffect(() => {
-    axios
-      .get("/api/v1/todos")
-      .then(response => {
-        if (response.data !== null) {
-          setDisplayedTodos(response.data);
-          setTodos(response.data);
-          sortBy("Deadline");
-          setLoading(false);
-        }
-      })
-      .catch(err => dialog.alert("Error, unable to fetch Todos.\n" + err));
-    axios
-      .get("/api/v1/tags")
-      .then(response => {
-        if (response.data !== null && response.data.length !== 0) {
-          const tl = [...new Set(response.data)] as string[];
-          let objtl = [] as Object[];
-          tl.forEach((tag: string) => {
-            objtl.push({ value: tag, label: tag });
-          });
-          setTagList(objtl);
-        }
-      })
-      .catch(err => console.log(err));
-  // eslint-disable-next-line
-  }, [dialog, toggleRefresh]);
+    dispatch(fetchTodos())
+      .then(() => setLoading(false))
+      .catch((err: string) =>
+        dialog.alert("Error, unable to fetch Todos. " + err)
+      );
+    dispatch(fetchTags()).catch((err: string) => console.log(err));
+    // eslint-disable-next-line
+  }, [toggleRefresh]);
+
+  useEffect(() => {
+    setDisplayedTodos(todos);
+    sortBy("Deadline");
+    // eslint-disable-next-line
+  }, [todos, toggleRefresh]);
+
+  useEffect(() => {
+    if (tags !== null && tags.length !== 0) {
+      const tl = [...new Set(tags)] as string[];
+      let objtl = [] as Object[];
+      tl.forEach((tag: string) => {
+        objtl.push({ value: tag, label: tag });
+      });
+      setTagList(objtl);
+    }
+  }, [tags, toggleRefresh]);
 
   return (
     <Container
@@ -671,10 +677,10 @@ const TodosContainer = () => {
 };
 
 const mapStateToProps = (state: any) => {
-    return {
-        session: state.session
-    };
+  return {
+    todos: state.todos.todos,
+    tags: state.todos.tags
+  };
 };
-
 
 export default connect(mapStateToProps)(TodosContainer);

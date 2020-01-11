@@ -1,5 +1,4 @@
 import React from "react";
-import axios from "axios";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -11,6 +10,8 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { useDialog } from "muibox";
+import { connect } from "react-redux";
+import { sessionSignup } from "../actions/index";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -32,41 +33,33 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SignupForm = () => {
+type Props = {
+  dispatch: any;
+};
+
+const SignupForm: React.FC<Props> = props => {
+  const { dispatch } = props;
   const classes = useStyles();
   const dialog = useDialog();
 
   const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (
-      e.currentTarget.password.value !== e.currentTarget.password_repeat.value
-    ) {
+    const formElem = e.currentTarget;
+    if (formElem.password.value !== formElem.password_repeat.value) {
       dialog.alert("Passwords do not match");
       return;
     }
-    if (e.currentTarget.password.value.length < 8) {
+    if (formElem.password.value.length < 8) {
       dialog.alert("Password must be at least 8 characters long");
       return;
     }
-    axios
-      .post("/api/v1/users", {
-        user: {
-          email: e.currentTarget.email.value,
-          username: e.currentTarget.username.value,
-          password: e.currentTarget.password.value
-        },
-        withCredentials: true
-      })
-      .then(response => {
-        if (response.data.error) {
-          dialog.alert("Error: " + String(response.data.error));
-        } else {
-          window.location.reload();
-        }
-      })
-      .catch(
-        error => "Error, unable to create account.\n" + dialog.alert(error)
-      );
+    dispatch(
+      sessionSignup(
+        formElem.email.value,
+        formElem.username.value,
+        formElem.password.value
+      )
+    ).catch((err: string) => dialog.alert("Error: " + err));
   };
 
   return (
@@ -145,4 +138,10 @@ const SignupForm = () => {
   );
 };
 
-export default SignupForm;
+const mapStateToProps = (state: any) => {
+  return {
+    session: state.session
+  };
+};
+
+export default connect(mapStateToProps)(SignupForm);

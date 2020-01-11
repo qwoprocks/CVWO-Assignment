@@ -1,16 +1,45 @@
-import { ADD_TODO, DELETE_TODO, FETCH_TODOS } from "../actions/types";
+import {
+  ADD_TODO,
+  UPDATE_TODO,
+  DELETE_TODO,
+  FETCH_TODOS,
+  FETCH_TAGS
+} from "../actions/types";
 
-const todos = (state = [], action: any) => {
+const initialState = {
+  todos: [],
+  tags: [],
+  response: []
+};
+
+const todos = (state = initialState, action: any) => {
   if (action !== undefined) {
     switch (action.type) {
       case ADD_TODO:
-        return [...state, action.payload] as any[];
+        return {
+          ...state,
+          response: action.response
+        };
+      case UPDATE_TODO:
+        return {
+          ...state,
+          response: action.response
+        };
       case DELETE_TODO:
-        return state.filter(
-          (todos: any) => todos.id !== action.payload.id
-        ) as any;
+        return {
+          ...state,
+          response: action.response
+        };
       case FETCH_TODOS:
-        return action.todos as any;
+        return {
+          ...state,
+          todos: action.todos
+        };
+      case FETCH_TAGS:
+        return {
+          ...state,
+          tags: action.tags
+        };
       default:
         return state as any;
     }

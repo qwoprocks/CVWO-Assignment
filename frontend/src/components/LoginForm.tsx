@@ -1,5 +1,4 @@
 import React from "react";
-import axios from "axios";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -11,6 +10,8 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { useDialog } from "muibox";
+import { connect } from "react-redux";
+import { sessionLogin } from "../actions/index";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -32,26 +33,21 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const LoginForm = () => {
+type Props = {
+  dispatch: any;
+};
+
+const LoginForm: React.FC<Props> = props => {
+  const { dispatch } = props;
   const classes = useStyles();
   const dialog = useDialog();
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    axios
-      .post("/api/v1/session", {
-        email: e.currentTarget.email.value,
-        password: e.currentTarget.password.value,
-        withCredentials: true
-      })
-      .then(response => {
-        if (response.data.error) {
-          dialog.alert(response.data.error);
-        } else {
-          window.location.reload();
-        }
-      })
-      .catch(error => dialog.alert(error));
+    const formElem = e.currentTarget;
+    dispatch(sessionLogin(formElem.email.value, formElem.password.value)).catch(
+      (err: string) => dialog.alert("Error: " + err)
+    );
   };
 
   return (
@@ -114,4 +110,10 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+const mapStateToProps = (state: any) => {
+  return {
+    session: state.session
+  };
+};
+
+export default connect(mapStateToProps)(LoginForm);
