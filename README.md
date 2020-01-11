@@ -2,7 +2,7 @@
 
 ## Heroku link
 
-Please visit https://test-cvwo-assignment.herokuapp.com/ for a live version of the application.
+Please visit https://test-cvwo-assignment.herokuapp.com/ for a live version of the application. The website is automatically deployed from the master branch of this repo.
 
 ## Running on Docker
 To run the docker container, first download [docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/install/).
