@@ -19,8 +19,9 @@ import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider
 } from "@material-ui/pickers";
+import { TagObject } from "../types";
 
-const tagHelper = (tags: any[]) => {
+const tagHelper = (tags: TagObject[]) => {
   const newTags = [] as string[];
   tags.forEach(tag => {
     const label = tag.label as string;
@@ -29,8 +30,8 @@ const tagHelper = (tags: any[]) => {
   return newTags;
 };
 
-const EditBox = (props: {
-  tagList: Object[];
+type Props = {
+  tagList: TagObject[];
   id: number;
   defaultTitle: string;
   defaultTags: string[];
@@ -38,10 +39,12 @@ const EditBox = (props: {
   open: boolean;
   save: (s: string, t: string[], da: boolean, deadline: Date | null) => void;
   cancel: (nc: boolean) => void;
-}) => {
+};
+
+const EditBox: React.FC<Props> = props => {
   const [title, setTitle] = useState("");
-  const [tags, setTags] = useState<Object[]>([]);
-  const [tagList, setTagList] = useState<Object[]>([]);
+  const [tags, setTags] = useState<TagObject[]>([]);
+  const [tagList, setTagList] = useState<TagObject[]>([]);
   const [deadlineAdded, setDeadlineAdded] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
@@ -56,15 +59,16 @@ const EditBox = (props: {
     ) {
       dateNotChanged = true;
     }
-    const newTags = tagHelper(tags);
+    const newTags = tagHelper(tags as TagObject[]);
     return (
       props.defaultTitle === title &&
-      props.defaultTags.length === newTags.length && props.defaultTags.every((value, index) => value === newTags[index]) &&
+      props.defaultTags.length === newTags.length &&
+      props.defaultTags.every((value, index) => value === newTags[index]) &&
       dateNotChanged
     );
   };
 
-  const handleChange = (newValue: any, actionMeta: any) => {
+  const handleChange = (newValue: any) => {
     if (newValue !== null) {
       setTags(newValue);
     } else {
@@ -74,7 +78,7 @@ const EditBox = (props: {
 
   useEffect(() => {
     setTitle(props.defaultTitle);
-    const tagObjs = [] as Object[];
+    const tagObjs = [] as TagObject[];
     props.defaultTags.forEach(tag => {
       tagObjs.push({ value: tag, label: tag });
     });

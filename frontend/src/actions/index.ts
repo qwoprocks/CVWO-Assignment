@@ -13,7 +13,7 @@ import {
 
 import { Dispatch } from 'redux';
 
-import { Session, Todo } from "../reducers/types";
+import { Session, Todo } from "../types";
 
 export const createTodo = (title: string, tags: string[], deadline: string) => {
   return (dispatch: Dispatch) => {

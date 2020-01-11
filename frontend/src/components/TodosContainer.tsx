@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useHistory, useLocation } from "react-router-dom";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import Checkbox from "@material-ui/core/Checkbox";
@@ -36,15 +37,7 @@ import {
   fetchTags,
   sessionLogout
 } from "../actions/index";
-
-interface Todo {
-  id: number;
-  title: string;
-  tags: string[];
-  done: boolean;
-  deadline: string;
-  created_at: string;
-}
+import { Todo, TagObject } from "../types";
 
 const StyledTaskList = styled(List)({
   width: "100%"
@@ -126,18 +119,20 @@ const StyledSortMenu = styled(Select)({
 });
 
 type Props = {
-    dispatch: any;
-    todos: Todo[];
-    tags: string[];
+  dispatch: Function;
+  todos: Todo[];
+  tags: string[];
 };
 
 const TodosContainer: React.FC<Props> = props => {
   const { dispatch, todos, tags } = props;
 
+  const history = useHistory();
+  const location = useLocation();
   const dialog = useDialog();
-  const searchBar: any = useRef(null);
+  const searchBar = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(true);
-  const [tagList, setTagList] = useState<Object[]>([]);
+  const [tagList, setTagList] = useState<TagObject[]>([]);
   const [displayedTodos, setDisplayedTodos] = useState<Todo[]>([]);
   const [toggleRefresh, setRefresh] = useState(false);
   const [editBoxOpen, setEditBoxOpen] = useState(false);
@@ -294,16 +289,18 @@ const TodosContainer: React.FC<Props> = props => {
 
   const handleTagClick = (e: React.MouseEvent<HTMLDivElement>, tag: string) => {
     e.stopPropagation();
-    const currSearchString = searchBar.current.value;
-    if (currSearchString.split(" ").includes(tag)) {
-      return;
-    } else if (currSearchString.trim() === "") {
-      searchBar.current.value = tag;
-    } else {
-      searchBar.current.value = currSearchString + " " + tag;
+    if (searchBar && searchBar.current) {
+      const currSearchString = searchBar.current.value;
+      if (currSearchString.split(" ").includes(tag)) {
+        return;
+      } else if (currSearchString.trim() === "") {
+        searchBar.current.value = tag;
+      } else {
+        searchBar.current.value = currSearchString + " " + tag;
+      }
+      filterTodos(searchBar.current.value.split(" "));
+      searchBar.current.focus();
     }
-    filterTodos(searchBar.current.value.split(" "));
-    searchBar.current.focus();
   };
 
   const filterTodos = (searchString: string[]) => {
@@ -318,20 +315,18 @@ const TodosContainer: React.FC<Props> = props => {
 
   const handleSortMenuChange = (e: React.ChangeEvent<{ value: unknown }>) => {
     const value = e.target.value as string;
-    sortBy(value);
+    history.push(`/todos?sortby=${value}`);
+    refreshTodos();
   };
 
-  const sortBy = (criteria: string) => {
-    setSelectedSort(criteria);
-    if (criteria === "Date created") {
+  const sortTodos = () => {
+    let criteria = (new URLSearchParams(location.search)).get("sortby");
+
+    if (criteria !== null) criteria = criteria.toLowerCase();
+
+    if (criteria === "datecreated") {
       setSortFunction(() => dateCreatedSort);
-    } else if (criteria === "Done status") {
-      setSortFunction(() => (a: Todo, b: Todo) => {
-        const done = doneStatusSort(a, b);
-        if (done !== 0) return done;
-        return dateCreatedSort(a, b);
-      });
-    } else if (criteria === "Deadline") {
+    } else if (criteria === "deadline") {
       setSortFunction(() => (a: Todo, b: Todo) => {
         const done = doneStatusSort(a, b);
         if (done !== 0) {
@@ -339,7 +334,15 @@ const TodosContainer: React.FC<Props> = props => {
         }
         return deadlineSort(a, b);
       });
+    } else { // DEFAULT IS SORT BY DONE STATUS + DATE CREATED
+      criteria = "donestatus";
+      setSortFunction(() => (a: Todo, b: Todo) => {
+        const done = doneStatusSort(a, b);
+        if (done !== 0) return done;
+        return dateCreatedSort(a, b);
+      });
     }
+    setSelectedSort(criteria);
     setSortMenuOpen(false);
   };
 
@@ -446,14 +449,14 @@ const TodosContainer: React.FC<Props> = props => {
 
   useEffect(() => {
     setDisplayedTodos(todos);
-    sortBy("Deadline");
+    sortTodos();
     // eslint-disable-next-line
   }, [todos, toggleRefresh]);
 
   useEffect(() => {
     if (tags !== null && tags.length !== 0) {
       const tl = [...new Set(tags)] as string[];
-      let objtl = [] as Object[];
+      let objtl = [] as TagObject[];
       tl.forEach((tag: string) => {
         objtl.push({ value: tag, label: tag });
       });
@@ -503,9 +506,9 @@ const TodosContainer: React.FC<Props> = props => {
                 onClose={() => setSortMenuOpen(false)}
                 onChange={handleSortMenuChange}
               >
-                <MenuItem value="Date created">Date created</MenuItem>
-                <MenuItem value="Done status">Done status</MenuItem>
-                <MenuItem value="Deadline">Deadline</MenuItem>
+                <MenuItem value="datecreated">Date created</MenuItem>
+                <MenuItem value="donestatus">Done status</MenuItem>
+                <MenuItem value="deadline">Deadline</MenuItem>
               </StyledSortMenu>
             </InputAdornment>
           }
@@ -528,7 +531,7 @@ const TodosContainer: React.FC<Props> = props => {
           displayedTodos.map(todo => {
             return (
               <StyledTaskItem
-                key={todo.id}
+                key={todo.created_at}
                 onClick={() => handleSelect(todo.id)}
                 dense
                 button
@@ -572,9 +575,10 @@ const TodosContainer: React.FC<Props> = props => {
                     <span>Tags:&nbsp;</span>
                     {todo.tags.length === 0
                       ? "-"
-                      : todo.tags.map(tag => {
+                      : todo.tags.map((tag, index) => {
                           return (
                             <StyledChip
+                              key={`todo-${todo.created_at}-tag-${index}`}
                               clickable
                               onClick={e => handleTagClick(e, tag)}
                               label={tag}
@@ -676,7 +680,9 @@ const TodosContainer: React.FC<Props> = props => {
   );
 };
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: {
+  todos: { todos: Todo[]; tags: string[] };
+}) => {
   return {
     todos: state.todos.todos,
     tags: state.todos.tags

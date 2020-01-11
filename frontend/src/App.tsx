@@ -10,15 +10,13 @@ import { useDialog } from "muibox";
 import TodosContainer from "./components/TodosContainer";
 import LoginForm from "./components/LoginForm";
 import SignupForm from "./components/SignupForm";
+import { Session } from "./types";
 import { connect } from "react-redux";
 import { getSession } from "./actions/index";
 
 type Props = {
-    dispatch: any;
-    session: {
-        user: number;
-        logged_in: boolean;
-    };
+    dispatch: Function;
+    session: Session;
 };
 
 const App: React.FC<Props> = props => {
@@ -29,12 +27,14 @@ const App: React.FC<Props> = props => {
     const [doneLoading, setDoneLoading] = useState(false);
 
     useEffect(() => {
-        dispatch(getSession()).then(() => {
-            setDoneLoading(true);
-        }).catch((err: string) => {
-            dialog.alert("Error, unable to fetch user.\n" + err);
-        });
-    // eslint-disable-next-line
+        dispatch(getSession())
+            .then(() => {
+                setDoneLoading(true);
+            })
+            .catch((err: string) => {
+                dialog.alert("Error, unable to fetch user.\n" + err);
+            });
+        // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
@@ -42,72 +42,41 @@ const App: React.FC<Props> = props => {
     }, [session]);
 
     return doneLoading ? (
-            <Router>
-                <div className="App">
-                    <header className="App-header">
-                        <h1>Todo List</h1>
-                    </header>
-                    {/*user === 0 ? (
-                    <Switch>
-                        <Route path="/login">
-                            <LoginForm />
-                        </Route>
-                        <Route path="/signup">
-                            <SignupForm />
-                        </Route>
-                        <Route path="/">
-                            <Redirect to="/login" />
-                        </Route>
-                    </Switch>
-                ) : (
-                    <Switch>
-                        <Route path="/todos">
+        <Router>
+            <div className="App">
+                <header className="App-header">
+                    <h1>Todo List</h1>
+                </header>
+                <Switch>
+                    <Route path="/login">
+                        {loggedIn ? <Redirect to="/todos" /> : <LoginForm />}
+                    </Route>
+                    <Route path="/signup">
+                        {loggedIn ? <Redirect to="/todos" /> : <SignupForm />}
+                    </Route>
+                    <Route path="/todos">
+                        {loggedIn ? (
                             <TodosContainer />
-                        </Route>
-                        <Route path="/">
+                        ) : (
+                            <Redirect to="/login" />
+                        )}
+                    </Route>
+                    <Route path="/">
+                        {loggedIn ? (
                             <Redirect to="/todos" />
-                        </Route>
-                    </Switch>
-                )*/}
-
-                    <Switch>
-                        <Route path="/login">
-                            {loggedIn ? (
-                                <Redirect to="/todos" />
-                            ) : (
-                                <LoginForm />
-                            )}
-                        </Route>
-                        <Route path="/signup">
-                            {loggedIn ? (
-                                <Redirect to="/todos" />
-                            ) : (
-                                <SignupForm />
-                            )}
-                        </Route>
-                        <Route path="/todos">
-                            {loggedIn ? (
-                                <TodosContainer />
-                            ) : (
-                                <Redirect to="/login" />
-                            )}
-                        </Route>
-                        <Route path="/">
-                            {loggedIn ? (
-                                <Redirect to="/todos" />
-                            ) : (
-                                <Redirect to="/login" />
-                            )}
-                        </Route>
-                    </Switch>
-                </div>
-            </Router>
+                        ) : (
+                            <Redirect to="/login" />
+                        )}
+                    </Route>
+                </Switch>
+            </div>
+        </Router>
     ) : (
         <></>
     );
 };
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: { session: Session }) => {
     return {
         session: state.session
     };

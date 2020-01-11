@@ -7,7 +7,7 @@ import {
   TodoActionTypes
 } from "../actions/types";
 
-import { Todo } from "./types";
+import { Todo } from "../types";
 
 const initialState = {
   todos: [],

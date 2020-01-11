@@ -6,7 +6,7 @@ import {
   SessionActionTypes
 } from "../actions/types";
 
-import { Session } from "./types";
+import { Session } from "../types";
 
 const session = (
   state = [],

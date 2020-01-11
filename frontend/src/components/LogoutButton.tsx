@@ -1,29 +1,33 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 
 const useStyles = makeStyles(theme => ({
     icon: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'absolute',
-        right: '10px',
-        top: '10px',
-        background: '#DDDDDD',
-        padding: '5px',
-        margin: '0',
-        borderRadius: '2px',
-        '& span': {
-            marginRight: '5px',
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "absolute",
+        right: "10px",
+        top: "10px",
+        background: "#DDDDDD",
+        padding: "5px",
+        margin: "0",
+        borderRadius: "2px",
+        "& span": {
+            marginRight: "5px"
         },
-        '&:hover': {
-            cursor: 'pointer',
-        },
-    },
+        "&:hover": {
+            cursor: "pointer"
+        }
+    }
 }));
 
-const LogoutButton = (props : {onClick : () => void}) => {
+type Props = {
+    onClick: () => void;
+};
+
+const LogoutButton: React.FC<Props> = props => {
     const classes = useStyles();
 
     return (
@@ -32,6 +36,6 @@ const LogoutButton = (props : {onClick : () => void}) => {
             <ExitToAppIcon />
         </div>
     );
-}
+};
 
 export default LogoutButton;

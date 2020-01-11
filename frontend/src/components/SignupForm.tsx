@@ -12,6 +12,7 @@ import Container from "@material-ui/core/Container";
 import { useDialog } from "muibox";
 import { connect } from "react-redux";
 import { sessionSignup } from "../actions/index";
+import { Session } from "../types";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -34,7 +35,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type Props = {
-  dispatch: any;
+  dispatch: Function;
 };
 
 const SignupForm: React.FC<Props> = props => {
@@ -138,7 +139,7 @@ const SignupForm: React.FC<Props> = props => {
   );
 };
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: { session: Session }) => {
   return {
     session: state.session
   };

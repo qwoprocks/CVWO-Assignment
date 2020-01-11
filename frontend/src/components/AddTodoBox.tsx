@@ -19,21 +19,24 @@ import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider
 } from "@material-ui/pickers";
+import { TagObject } from "../types";
 
-const AddTodoBox = (props: {
-  tagList: Object[];
+type Props = {
+  tagList: TagObject[];
   open: boolean;
   save: (s: string, t: string[], da: boolean, deadline: Date | null) => void;
   cancel: (nc: boolean) => void;
-}) => {
+};
+
+const AddTodoBox: React.FC<Props> = props => {
   const [title, setTitle] = useState("");
-  const [tags, setTags] = useState<Object[]>([]);
+  const [tags, setTags] = useState<TagObject[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [deadlineAdded, setDeadlineAdded] = useState(false);
 
   const hasNotChanged = () => title.trim() === "" && tags.length === 0;
 
-  const handleChange = (newValue: any, actionMeta: any) => {
+  const handleChange = (newValue: any) => {
     if (newValue !== null) {
       setTags(newValue);
     } else {
@@ -43,7 +46,7 @@ const AddTodoBox = (props: {
 
   const saveTodos = (
     title: string,
-    tags: any[],
+    tags: TagObject[],
     deadlineAdded: boolean,
     selectedDate: Date | null
   ) => {
