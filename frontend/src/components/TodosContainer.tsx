@@ -28,6 +28,7 @@ import Container from "@material-ui/core/Container";
 import SortIcon from "@material-ui/icons/Sort";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
+import { connect } from "react-redux";
 
 interface Todo {
   id: number;
@@ -451,6 +452,7 @@ const TodosContainer = () => {
         }
       })
       .catch(err => console.log(err));
+  // eslint-disable-next-line
   }, [dialog, toggleRefresh]);
 
   return (
@@ -668,4 +670,11 @@ const TodosContainer = () => {
   );
 };
 
-export default TodosContainer;
+const mapStateToProps = (state: any) => {
+    return {
+        session: state.session
+    };
+};
+
+
+export default connect(mapStateToProps)(TodosContainer);
