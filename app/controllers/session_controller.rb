@@ -34,8 +34,7 @@ class SessionController < ApplicationController
             }
         else
             render json: {
-                logged_in: false,
-                message: session[:userid]
+                logged_in: false
             }
         end
     end

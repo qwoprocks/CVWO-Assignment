@@ -11,14 +11,7 @@ import {
   SESSION_LOGOUT
 } from "./types";
 
-interface Todo {
-  id: number;
-  title: string;
-  tags: string[];
-  done: boolean;
-  deadline: string;
-  created_at: string;
-}
+import { Session, Todo } from "../reducers/types";
 
 export const createTodo = (title: string, tags: string[], deadline: string) => {
   return (dispatch: any) => {
@@ -109,7 +102,7 @@ export const fetchTodos = () => {
   };
 };
 
-export const fetchTodosSuccess = (todos: any[]) => {
+export const fetchTodosSuccess = (todos: Todo[]) => {
   return {
     type: FETCH_TODOS,
     todos
@@ -134,7 +127,7 @@ export const fetchTags = () => {
   };
 };
 
-export const fetchTagsSuccess = (tags: any[]) => {
+export const fetchTagsSuccess = (tags: string[]) => {
   return {
     type: FETCH_TAGS,
     tags
@@ -157,7 +150,7 @@ export const getSession = () => {
   };
 };
 
-export const getSessionSuccess = (session: any) => {
+export const getSessionSuccess = (session: Session) => {
   return {
     type: GET_SESSION,
     session
@@ -193,7 +186,7 @@ export const sessionSignup = (
   };
 };
 
-export const sessionSignupSuccess = (session: any) => {
+export const sessionSignupSuccess = (session: Session) => {
   return {
     type: SESSION_SIGNUP,
     session
@@ -222,7 +215,7 @@ export const sessionLogin = (email: string, password: string) => {
   };
 };
 
-export const sessionLoginSuccess = (session: any) => {
+export const sessionLoginSuccess = (session: Session) => {
   return {
     type: SESSION_LOGIN,
     session
@@ -243,7 +236,7 @@ export const sessionLogout = () => {
   };
 };
 
-export const sessionLogoutSuccess = (session: any) => {
+export const sessionLogoutSuccess = (session: Session) => {
   return {
     type: SESSION_LOGOUT,
     session

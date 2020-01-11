@@ -2,10 +2,19 @@ import {
   GET_SESSION,
   SESSION_LOGIN,
   SESSION_SIGNUP,
-  SESSION_LOGOUT
+  SESSION_LOGOUT,
+  SessionActionTypes
 } from "../actions/types";
 
-const session = (state = [], action: any) => {
+import { Session } from "./types";
+
+const session = (
+  state = [],
+  action: {
+    type: SessionActionTypes;
+    session: Session;
+  }
+) => {
   if (action !== undefined) {
     switch (action.type) {
       case GET_SESSION:
@@ -17,10 +26,10 @@ const session = (state = [], action: any) => {
       case SESSION_LOGOUT:
         return action.session;
       default:
-        return state as any;
+        return state;
     }
   }
-  return state as any;
+  return state;
 };
 
 export default session;

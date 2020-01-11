@@ -3,8 +3,11 @@ import {
   UPDATE_TODO,
   DELETE_TODO,
   FETCH_TODOS,
-  FETCH_TAGS
+  FETCH_TAGS,
+  TodoActionTypes
 } from "../actions/types";
+
+import { Todo } from "./types";
 
 const initialState = {
   todos: [],
@@ -12,7 +15,15 @@ const initialState = {
   response: []
 };
 
-const todos = (state = initialState, action: any) => {
+const todos = (
+  state = initialState,
+  action: {
+    type: TodoActionTypes;
+    response: string;
+    todos: Todo[];
+    tags: string[];
+  }
+) => {
   if (action !== undefined) {
     switch (action.type) {
       case ADD_TODO:
@@ -41,10 +52,10 @@ const todos = (state = initialState, action: any) => {
           tags: action.tags
         };
       default:
-        return state as any;
+        return state;
     }
   }
-  return state as any;
+  return state;
 };
 
 export default todos;
