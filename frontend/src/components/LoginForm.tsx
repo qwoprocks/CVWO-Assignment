@@ -9,7 +9,6 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import { useDialog } from "muibox";
 import { connect } from "react-redux";
 import { sessionLogin } from "../actions/index";
 import { Session } from "../types";
@@ -41,7 +40,6 @@ type Props = {
 const LoginForm: React.FC<Props> = props => {
   const { dispatch } = props;
   const classes = useStyles();
-  const dialog = useDialog();
 
   const [errorMsg, setErrorMsg] = useState("");
 
