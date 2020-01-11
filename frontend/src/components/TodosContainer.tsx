@@ -320,7 +320,7 @@ const TodosContainer: React.FC<Props> = props => {
   };
 
   const sortTodos = () => {
-    let criteria = (new URLSearchParams(location.search)).get("sortby");
+    let criteria = new URLSearchParams(location.search).get("sortby");
 
     if (criteria !== null) criteria = criteria.toLowerCase();
 
@@ -334,7 +334,8 @@ const TodosContainer: React.FC<Props> = props => {
         }
         return deadlineSort(a, b);
       });
-    } else { // DEFAULT IS SORT BY DONE STATUS + DATE CREATED
+    } else {
+      // DEFAULT IS SORT BY DONE STATUS + DATE CREATED
       criteria = "donestatus";
       setSortFunction(() => (a: Todo, b: Todo) => {
         const done = doneStatusSort(a, b);
