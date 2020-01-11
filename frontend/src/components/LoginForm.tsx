@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -43,11 +43,13 @@ const LoginForm: React.FC<Props> = props => {
   const classes = useStyles();
   const dialog = useDialog();
 
+  const [errorMsg, setErrorMsg] = useState("");
+
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formElem = e.currentTarget;
     dispatch(sessionLogin(formElem.email.value, formElem.password.value)).catch(
-      (err: string) => dialog.alert("Error: " + err)
+      (err: string) => setErrorMsg(err)
     );
   };
 
@@ -63,6 +65,9 @@ const LoginForm: React.FC<Props> = props => {
         </Typography>
         <form className={classes.form} onSubmit={handleLogin} noValidate>
           <TextField
+            onChange={() => {
+              if (errorMsg !== "") setErrorMsg("");
+            }}
             variant="outlined"
             margin="normal"
             required
@@ -72,8 +77,12 @@ const LoginForm: React.FC<Props> = props => {
             name="email"
             autoComplete="email"
             autoFocus
+            error={errorMsg !== ""}
           />
           <TextField
+            onChange={() => {
+              if (errorMsg !== "") setErrorMsg("");
+            }}
             variant="outlined"
             margin="normal"
             required
@@ -83,6 +92,8 @@ const LoginForm: React.FC<Props> = props => {
             type="password"
             id="password"
             autoComplete="current-password"
+            error={errorMsg !== ""}
+            helperText={errorMsg}
           />
           <Button
             type="submit"
