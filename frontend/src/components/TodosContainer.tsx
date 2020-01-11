@@ -447,7 +447,6 @@ const TodosContainer = () => {
           tl.forEach((tag: string) => {
             objtl.push({ value: tag, label: tag });
           });
-          console.log(objtl);
           setTagList(objtl);
         }
       })
@@ -475,7 +474,7 @@ const TodosContainer = () => {
           id="outlined-adornment-search"
           type="text"
           onChange={handleSearch}
-          placeholder="Search for a todo"
+          placeholder="Search for a todo, space to separate search terms"
           labelWidth={60}
           endAdornment={
             <InputAdornment position="end">

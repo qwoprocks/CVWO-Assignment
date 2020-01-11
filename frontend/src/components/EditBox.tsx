@@ -45,13 +45,24 @@ const EditBox = (props: {
   const [deadlineAdded, setDeadlineAdded] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
-  const hasNotChanged = () =>
-    (props.defaultTitle === title &&
-      props.defaultTags === tagHelper(tags) &&
-      props.defaultDeadline === null) ||
-    selectedDate === null
-      ? true
-      : selectedDate.toLocaleDateString() === props.defaultDeadline;
+  const hasNotChanged = () => {
+    let dateNotChanged = false;
+    if (props.defaultDeadline === null && selectedDate === null) {
+      dateNotChanged = true;
+    }
+    if (
+      selectedDate !== null &&
+      selectedDate.toLocaleDateString() === props.defaultDeadline
+    ) {
+      dateNotChanged = true;
+    }
+    const newTags = tagHelper(tags);
+    return (
+      props.defaultTitle === title &&
+      props.defaultTags.length === newTags.length && props.defaultTags.every((value, index) => value === newTags[index]) &&
+      dateNotChanged
+    );
+  };
 
   const handleChange = (newValue: any, actionMeta: any) => {
     if (newValue !== null) {
@@ -77,6 +88,7 @@ const EditBox = (props: {
       setDeadlineAdded(false);
     }
   }, [
+    props.open,
     props.defaultTitle,
     props.defaultTags,
     props.tagList,
