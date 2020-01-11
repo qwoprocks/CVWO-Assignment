@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -40,6 +41,7 @@ type Props = {
 const LoginForm: React.FC<Props> = props => {
   const { dispatch } = props;
   const classes = useStyles();
+  const history = useHistory();
 
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -109,7 +111,11 @@ const LoginForm: React.FC<Props> = props => {
               </Link>
             </Grid>*/}
             <Grid item>
-              <Link href="/signup" variant="body2">
+              <Link
+                href="#"
+                onClick={() => history.push("/signup")}
+                variant="body2"
+              >
                 {"Don't have an account? Sign Up"}
               </Link>
             </Grid>

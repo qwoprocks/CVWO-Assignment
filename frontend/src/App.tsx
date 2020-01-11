@@ -47,28 +47,28 @@ const App: React.FC<Props> = props => {
                 <header className="App-header">
                     <h1>Todo List</h1>
                 </header>
-                <Switch>
-                    <Route path="/login">
-                        {loggedIn ? <Redirect to="/todos" /> : <LoginForm />}
-                    </Route>
-                    <Route path="/signup">
-                        {loggedIn ? <Redirect to="/todos" /> : <SignupForm />}
-                    </Route>
-                    <Route path="/todos">
-                        {loggedIn ? (
+                {loggedIn ? (
+                    <Switch>
+                        <Route path="/todos">
                             <TodosContainer />
-                        ) : (
-                            <Redirect to="/login" />
-                        )}
-                    </Route>
-                    <Route path="/">
-                        {loggedIn ? (
+                        </Route>
+                        <Route path="/">
                             <Redirect to="/todos" />
-                        ) : (
+                        </Route>
+                    </Switch>
+                ) : (
+                    <Switch>
+                        <Route path="/login">
+                            <LoginForm />
+                        </Route>
+                        <Route path="/signup">
+                            <SignupForm />
+                        </Route>
+                        <Route path="/">
                             <Redirect to="/login" />
-                        )}
-                    </Route>
-                </Switch>
+                        </Route>
+                    </Switch>
+                )}
             </div>
         </Router>
     ) : (

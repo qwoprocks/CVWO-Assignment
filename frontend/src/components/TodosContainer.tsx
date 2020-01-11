@@ -28,6 +28,8 @@ import Container from "@material-ui/core/Container";
 import SortIcon from "@material-ui/icons/Sort";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import { connect } from "react-redux";
 import {
   createTodo,
@@ -118,6 +120,10 @@ const StyledSortMenu = styled(Select)({
   }
 });
 
+const Alert = (props: AlertProps) => {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 type Props = {
   dispatch: Function;
   todos: Todo[];
@@ -154,6 +160,7 @@ const TodosContainer: React.FC<Props> = props => {
   const [sortFunction, setSortFunction] = useState<
     null | ((a: Todo, b: Todo) => number)
   >(null);
+  const [successSnackbarOpen, setSuccessSnackbarOpen] = useState(false);
   const refreshTodos = () => setRefresh(!toggleRefresh);
 
   const handleCreateTodo = (
@@ -162,7 +169,10 @@ const TodosContainer: React.FC<Props> = props => {
     deadline: string
   ) => {
     dispatch(createTodo(title, tags, deadline))
-      .then(() => refreshTodos())
+      .then(() => {
+        refreshTodos();
+        setSuccessSnackbarOpen(true);
+      })
       .catch((err: string) =>
         dialog.alert("Error, unable to create Todo. " + err)
       );
@@ -427,6 +437,14 @@ const TodosContainer: React.FC<Props> = props => {
     }
   };
 
+  const handleSnackbarClose = (event?: React.SyntheticEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setSuccessSnackbarOpen(false);
+  };
+
   useEffect(() => {
     let newTodos = [...todos];
     if (filterFunction !== null) {
@@ -630,6 +648,11 @@ const TodosContainer: React.FC<Props> = props => {
         }
         cancel={(nc: boolean) => handleEditBoxCancel(nc)}
       />
+      <Snackbar open={successSnackbarOpen} autoHideDuration={5000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} color="success">
+          Todo created!
+        </Alert>
+      </Snackbar>
       {selectedTodos.length > 0 ? (
         <div
           style={{

@@ -1,4 +1,5 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -42,6 +43,7 @@ const SignupForm: React.FC<Props> = props => {
   const { dispatch } = props;
   const classes = useStyles();
   const dialog = useDialog();
+  const history = useHistory();
 
   const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -128,7 +130,11 @@ const SignupForm: React.FC<Props> = props => {
           </Button>
           <Grid container>
             <Grid item>
-              <Link href="/login" variant="body2">
+              <Link
+                href="#"
+                onClick={() => history.push("/login")}
+                variant="body2"
+              >
                 {"Already have an account? Login."}
               </Link>
             </Grid>
