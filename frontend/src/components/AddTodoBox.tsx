@@ -1,5 +1,6 @@
 import "date-fns";
 import React, { useState } from "react";
+import CreatableSelect from "react-select/creatable";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -7,7 +8,6 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
-import ChipInput from "material-ui-chip-input";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
@@ -21,16 +21,39 @@ import {
 } from "@material-ui/pickers";
 
 const AddTodoBox = (props: {
+  tagList: Object[];
   open: boolean;
   save: (s: string, t: string[], da: boolean, deadline: Date | null) => void;
   cancel: (nc: boolean) => void;
 }) => {
   const [title, setTitle] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<Object[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [deadlineAdded, setDeadlineAdded] = useState(false);
 
   const hasNotChanged = () => title.trim() === "" && tags.length === 0;
+
+  const handleChange = (newValue: any, actionMeta: any) => {
+    if (newValue !== null) {
+      setTags(newValue);
+    } else {
+      setTags([]);
+    }
+  };
+
+  const saveTodos = (
+    title: string,
+    tags: any[],
+    deadlineAdded: boolean,
+    selectedDate: Date | null
+  ) => {
+    const newTags = [] as string[];
+    tags.forEach(tag => {
+      const label = tag.label as string;
+      newTags.push(label);
+    });
+    props.save(title, newTags, deadlineAdded, selectedDate);
+  };
 
   const reset = () => {
     setDeadlineAdded(false);
@@ -60,10 +83,13 @@ const AddTodoBox = (props: {
           />
         </DialogContentText>
         <DialogContentText id="edit-dialog-chips">
-          <ChipInput
-            fullWidth
-            label="Tags"
-            onChange={(chips: string[]) => setTags(chips)}
+          <CreatableSelect
+            isMulti
+            placeholder="Tags"
+            maxMenuHeight={120}
+            styles={{ menu: base => ({ ...base, position: "relative" }) }}
+            onChange={handleChange}
+            options={props.tagList}
           />
         </DialogContentText>
         <br />
@@ -109,7 +135,7 @@ const AddTodoBox = (props: {
       </DialogContent>
       <DialogActions>
         <Button
-          onClick={() => props.save(title, tags, deadlineAdded, selectedDate)}
+          onClick={() => saveTodos(title, tags, deadlineAdded, selectedDate)}
           color="primary"
         >
           Save

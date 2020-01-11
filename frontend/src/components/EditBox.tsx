@@ -1,5 +1,6 @@
 import "date-fns";
 import React, { useState, useEffect } from "react";
+import CreatableSelect from "react-select/creatable";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -7,7 +8,6 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
-import ChipInput from "material-ui-chip-input";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import ExpansionPanelSummary from "@material-ui/core/ExpansionPanelSummary";
 import ExpansionPanelDetails from "@material-ui/core/ExpansionPanelDetails";
@@ -20,7 +20,17 @@ import {
   MuiPickersUtilsProvider
 } from "@material-ui/pickers";
 
+const tagHelper = (tags: any[]) => {
+  const newTags = [] as string[];
+  tags.forEach(tag => {
+    const label = tag.label as string;
+    newTags.push(label);
+  });
+  return newTags;
+};
+
 const EditBox = (props: {
+  tagList: Object[];
   id: number;
   defaultTitle: string;
   defaultTags: string[];
@@ -30,17 +40,35 @@ const EditBox = (props: {
   cancel: (nc: boolean) => void;
 }) => {
   const [title, setTitle] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<Object[]>([]);
+  const [tagList, setTagList] = useState<Object[]>([]);
   const [deadlineAdded, setDeadlineAdded] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
   const hasNotChanged = () =>
-    props.defaultTitle === title && props.defaultTags === tags && (props.defaultDeadline === null || selectedDate === null ? true : selectedDate.toLocaleDateString() === props.defaultDeadline);
+    (props.defaultTitle === title &&
+      props.defaultTags === tagHelper(tags) &&
+      props.defaultDeadline === null) ||
+    selectedDate === null
+      ? true
+      : selectedDate.toLocaleDateString() === props.defaultDeadline;
+
+  const handleChange = (newValue: any, actionMeta: any) => {
+    if (newValue !== null) {
+      setTags(newValue);
+    } else {
+      setTags([]);
+    }
+  };
 
   useEffect(() => {
     setTitle(props.defaultTitle);
-    setTags(props.defaultTags);
-    console.log(props.defaultDeadline);
+    const tagObjs = [] as Object[];
+    props.defaultTags.forEach(tag => {
+      tagObjs.push({ value: tag, label: tag });
+    });
+    setTags(tagObjs);
+    setTagList(props.tagList);
     if (props.defaultDeadline !== "" && props.defaultDeadline !== null) {
       setSelectedDate(new Date(props.defaultDeadline));
       setDeadlineAdded(true);
@@ -48,7 +76,12 @@ const EditBox = (props: {
       setSelectedDate(new Date());
       setDeadlineAdded(false);
     }
-  }, [props.defaultTitle, props.defaultTags, props.defaultDeadline]);
+  }, [
+    props.defaultTitle,
+    props.defaultTags,
+    props.tagList,
+    props.defaultDeadline
+  ]);
 
   return (
     <Dialog
@@ -71,10 +104,14 @@ const EditBox = (props: {
           />
         </DialogContentText>
         <DialogContentText id="edit-dialog-chips">
-          <ChipInput
-            label="Tags"
-            defaultValue={props.defaultTags}
-            onChange={(chips: string[]) => setTags(chips)}
+          <CreatableSelect
+            isMulti
+            placeholder="Tags"
+            maxMenuHeight={120}
+            styles={{ menu: base => ({ ...base, position: "relative" }) }}
+            onChange={handleChange}
+            options={tagList}
+            defaultValue={tags}
           />
         </DialogContentText>
         <DialogContentText id="add-deadline">
@@ -120,7 +157,9 @@ const EditBox = (props: {
 
       <DialogActions>
         <Button
-          onClick={() => props.save(title, tags, deadlineAdded, selectedDate)}
+          onClick={() =>
+            props.save(title, tagHelper(tags), deadlineAdded, selectedDate)
+          }
           color="primary"
         >
           Save

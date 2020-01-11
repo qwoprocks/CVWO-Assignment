@@ -122,6 +122,7 @@ const TodosContainer = () => {
   const searchBar: any = useRef(null);
   const [loading, setLoading] = useState(true);
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [tagList, setTagList] = useState<Object[]>([]);
   const [displayedTodos, setDisplayedTodos] = useState<Todo[]>([]);
   const [toggleRefresh, setRefresh] = useState(false);
   const [editBoxOpen, setEditBoxOpen] = useState(false);
@@ -427,7 +428,7 @@ const TodosContainer = () => {
 
   useEffect(() => {
     axios
-      .get(`/api/v1/todos`)
+      .get("/api/v1/todos")
       .then(response => {
         if (response.data !== null) {
           setDisplayedTodos(response.data);
@@ -437,6 +438,20 @@ const TodosContainer = () => {
         }
       })
       .catch(err => dialog.alert("Error, unable to fetch Todos.\n" + err));
+    axios
+      .get("/api/v1/tags")
+      .then(response => {
+        if (response.data !== null && response.data.length !== 0) {
+          const tl = [...new Set(response.data)] as string[];
+          let objtl = [] as Object[];
+          tl.forEach((tag: string) => {
+            objtl.push({ value: tag, label: tag });
+          });
+          console.log(objtl);
+          setTagList(objtl);
+        }
+      })
+      .catch(err => console.log(err));
   }, [dialog, toggleRefresh]);
 
   return (
@@ -490,6 +505,7 @@ const TodosContainer = () => {
         />
       </FormControl>
       <AddTodoBox
+        tagList={tagList}
         open={addTodoBoxOpen}
         save={(s: string, t: string[], da: boolean, deadline: Date | null) =>
           handleAddTodoBoxSave(s, t, da, deadline)
@@ -591,6 +607,7 @@ const TodosContainer = () => {
         )}
       </StyledTaskList>
       <EditBox
+        tagList={tagList}
         id={editTodo.id}
         defaultTitle={editTodo.title}
         defaultTags={editTodo.tags}

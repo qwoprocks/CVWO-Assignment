@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
   scope '/api/v1' do
       resources :todos
+      resources :tags, only: [:index]
       resources :session
       resources :users
   end
