@@ -11,10 +11,12 @@ import {
   SESSION_LOGOUT
 } from "./types";
 
+import { Dispatch } from 'redux';
+
 import { Session, Todo } from "../reducers/types";
 
 export const createTodo = (title: string, tags: string[], deadline: string) => {
-  return (dispatch: any) => {
+  return (dispatch: Dispatch) => {
     return new Promise((resolve, reject) => {
       axios
         .post("/api/v1/todos", {
@@ -39,7 +41,7 @@ export const createTodoSuccess = (response: any) => {
 };
 
 export const updateTodo = (todo: Todo) => {
-  return (dispatch: any) => {
+  return (dispatch: Dispatch) => {
     return new Promise((resolve, reject) => {
       axios
         .put(`/api/v1/todos/${todo.id}`, {
@@ -62,7 +64,7 @@ export const updateTodoSuccess = (response: any) => {
 };
 
 export const deleteTodo = (id: number) => {
-  return (dispatch: any) => {
+  return (dispatch: Dispatch) => {
     return new Promise((resolve, reject) => {
       axios
         .delete(`/api/v1/todos/${id}`)
@@ -85,7 +87,7 @@ export const deleteTodoSuccess = (response: any) => {
 };
 
 export const fetchTodos = () => {
-  return (dispatch: any) => {
+  return (dispatch: Dispatch) => {
     return new Promise((resolve, reject) => {
       axios
         .get("/api/v1/todos")
@@ -110,7 +112,7 @@ export const fetchTodosSuccess = (todos: Todo[]) => {
 };
 
 export const fetchTags = () => {
-  return (dispatch: any) => {
+  return (dispatch: Dispatch) => {
     return new Promise((resolve, reject) => {
       axios
         .get("/api/v1/tags")
@@ -135,7 +137,7 @@ export const fetchTagsSuccess = (tags: string[]) => {
 };
 
 export const getSession = () => {
-  return (dispatch: any) => {
+  return (dispatch: Dispatch) => {
     return new Promise((resolve, reject) => {
       axios
         .get("/api/v1/session", { withCredentials: true })
@@ -162,7 +164,7 @@ export const sessionSignup = (
   username: string,
   password: string
 ) => {
-  return (dispatch: any) => {
+  return (dispatch: Dispatch) => {
     return new Promise((resolve, reject) => {
       axios
         .post("/api/v1/users", {
@@ -194,7 +196,7 @@ export const sessionSignupSuccess = (session: Session) => {
 };
 
 export const sessionLogin = (email: string, password: string) => {
-  return (dispatch: any) => {
+  return (dispatch: Dispatch) => {
     return new Promise((resolve, reject) => {
       axios
         .post("/api/v1/session", {
@@ -223,7 +225,7 @@ export const sessionLoginSuccess = (session: Session) => {
 };
 
 export const sessionLogout = () => {
-  return (dispatch: any) => {
+  return (dispatch: Dispatch) => {
     return new Promise((resolve, reject) => {
       axios
         .delete("/api/v1/session/0")
