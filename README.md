@@ -1,8 +1,11 @@
 # CVWO Assignment
 
-## Write-ups
+## Write-ups and Manual
 
 Refer to the files "Mid-assignment write-up.pdf" and "Final submission write-up.pdf" for the write-ups.
+
+
+Refer to the file "Manual.pdf" for the Manual of the Todo Application.
 
 ## Heroku link
 
