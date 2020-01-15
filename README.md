@@ -1,5 +1,9 @@
 # CVWO Assignment
 
+## Write-ups
+
+Refer to the files "Mid-assignment write-up.pdf" and "Final submission write-up.pdf" for the write-ups.
+
 ## Heroku link
 
 Please visit https://test-cvwo-assignment.herokuapp.com/ for a live version of the application. The website is automatically deployed from the master branch of this repo.
