@@ -23,7 +23,7 @@ class SessionController < ApplicationController
     def is_logged_in?
         begin
             @current_user ||= User.find(session[:userid]) if session[:userid]
-        rescue ActiveRecord::RecordNotFound => e
+        rescue ActiveRecord::ActiveRecordError => e
             destroy
             return
         end
