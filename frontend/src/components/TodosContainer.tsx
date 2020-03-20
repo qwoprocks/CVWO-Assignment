@@ -93,7 +93,7 @@ const StyledSortIcon = styled(SortIcon)({
   }
 });
 
-const StyledDeadline = styled(({ overdue, ...props }) => (
+const StyledDeadline = styled(({...props}) => (
   <Tooltip
     classes={{ popper: props.className, tooltip: "tooltip", arrow: "arrow" }}
     {...props}
@@ -101,11 +101,11 @@ const StyledDeadline = styled(({ overdue, ...props }) => (
 ))({
   zIndex: 0,
   "& .arrow": {
-    color: props => (props.overdue ? "red" : "")
+    color: props => ((props as any).overdue ? "red" : "")
   },
   "& .tooltip": {
     fontSize: "0.75em",
-    backgroundColor: props => (props.overdue ? "red" : "")
+    backgroundColor: props => ((props as any).overdue ? "red" : "")
   }
 });
 
